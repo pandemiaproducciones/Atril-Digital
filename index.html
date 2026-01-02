@@ -3,181 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestión de Bandas</title>
+    <title>Sinfónica App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .hidden { display: none; }
-        .active-process { border: 4px solid #1e40af; background-color: #eff6ff; }
         .active-tab { border-bottom: 4px solid #1e40af; color: #1e40af; }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-gray-100 min-h-screen font-sans">
 
     <div id="screen-pin" class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-sm text-center">
-            <h1 class="text-3xl font-black text-blue-900 mb-2">BANDA</h1>
-            <p class="text-gray-500 mb-6 font-medium">Control de Asistencia</p>
-            <input type="password" id="pin-input" placeholder="PIN" class="w-full p-4 border-2 rounded-2xl mb-4 text-center text-2xl tracking-[0.5em] focus:border-blue-500 outline-none">
-            <button onclick="checkPin()" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-bold text-lg hover:bg-blue-700 shadow-lg transition-all">ENTRAR</button>
+        <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-sm text-center border-t-8 border-blue-900">
+            <h1 id="display-band-name" class="text-2xl font-black text-gray-800 mb-6 uppercase">Banda Sinfónica</h1>
+            <input type="password" id="pin-input" placeholder="PIN" class="w-full p-4 border rounded-2xl mb-4 text-center text-2xl tracking-widest">
+            <button onclick="checkPin()" class="w-full bg-blue-900 text-white p-4 rounded-2xl font-bold shadow-lg">ENTRAR</button>
         </div>
     </div>
 
-    <div id="screen-process" class="hidden p-6 max-w-2xl mx-auto">
-        <h2 class="text-2xl font-bold text-blue-900 mb-6 mt-8">Seleccione el Proceso:</h2>
-        <div class="grid grid-cols-1 gap-4">
-            <button onclick="selectProcess('PREBANDA')" class="p-8 bg-white rounded-3xl shadow-md border-2 border-transparent hover:border-blue-400 text-left">
-                <span class="text-3xl block">🌱</span>
-                <span class="text-xl font-bold text-gray-800">PREBANDA</span>
-            </button>
-            <button onclick="selectProcess('BANDA INFANTIL')" class="p-8 bg-white rounded-3xl shadow-md border-2 border-transparent hover:border-blue-400 text-left">
-                <span class="text-3xl block">🎺</span>
-                <span class="text-xl font-bold text-gray-800">BANDA INFANTIL</span>
-            </button>
-            <button onclick="selectProcess('BANDA TITULAR')" class="p-8 bg-white rounded-3xl shadow-md border-2 border-transparent hover:border-blue-400 text-left">
+    <div id="screen-menu" class="hidden p-6 max-w-md mx-auto space-y-4">
+        <h2 class="text-xl font-bold text-blue-900 mb-4">Panel del Director</h2>
+        
+        <button onclick="goToProcessSelection()" class="w-full bg-white p-6 rounded-2xl shadow-sm border-l-4 border-green-500 flex items-center justify-between">
+            <div class="text-left">
+                <p class="font-bold text-lg text-gray-800">Tomar Asistencia</p>
+                <p class="text-sm text-gray-500">Ensayos o Presentaciones</p>
+            </div>
+            <span class="text-2xl">📝</span>
+        </button>
+
+        <button onclick="alert('Próximamente: Lista de eventos realizados')" class="w-full bg-white p-6 rounded-2xl shadow-sm border-l-4 border-blue-500 flex items-center justify-between">
+            <div class="text-left">
+                <p class="font-bold text-lg text-gray-800">Historial de Eventos</p>
+                <p class="text-sm text-gray-500">Ver conciertos pasados</p>
+            </div>
+            <span class="text-2xl">🎺</span>
+        </button>
+
+        <button onclick="showConfig()" class="w-full bg-white p-6 rounded-2xl shadow-sm border-l-4 border-gray-400 flex items-center justify-between">
+            <div class="text-left">
+                <p class="font-bold text-lg text-gray-800">Configuración</p>
+                <p class="text-sm text-gray-500">Nombre de banda y Drive</p>
+            </div>
+            <span class="text-2xl">⚙️</span>
+        </button>
+    </div>
+
+    <div id="screen-config" class="hidden p-6 max-w-md mx-auto">
+        <button onclick="showMenu()" class="mb-4 text-blue-600 font-bold">← Volver</button>
+        <div class="bg-white p-6 rounded-2xl shadow-lg">
+            <label class="block font-bold mb-2">Nombre de la Banda:</label>
+            <input type="text" id="cfg-band-name" class="w-full p-3 border rounded-xl mb-4">
+            <button onclick="saveConfig()" class="w-full bg-blue-900 text-white p-3 rounded-xl font-bold">Guardar Cambios</button>
+        </div>
+    </div>
+
+    <div id="screen-activity" class="hidden p-6 max-w-md mx-auto space-y-6">
+        <button onclick="showMenu()" class="text-blue-600 font-bold">← Volver</button>
+        <h2 class="text-2xl font-bold text-gray-800">¿Qué actividad es hoy?</h2>
+        
+        <div class="flex gap-4">
+            <button onclick="setActivity('Ensayo')" class="flex-1 bg-white p-6 rounded-2xl shadow-md border-2 border-transparent focus:border-blue-500">
                 <span class="text-3xl block">🎼</span>
-                <span class="text-xl font-bold text-gray-800">BANDA TITULAR</span>
+                <span class="font-bold">ENSAYO</span>
+            </button>
+            <button onclick="toggleEventInput()" class="flex-1 bg-white p-6 rounded-2xl shadow-md border-2 border-transparent focus:border-blue-500">
+                <span class="text-3xl block">🏟️</span>
+                <span class="font-bold">EVENTO</span>
             </button>
         </div>
-    </div>
 
-    <div id="screen-event" class="hidden p-6 max-w-2xl mx-auto">
-        <button onclick="backToProcess()" class="text-blue-600 font-bold mb-4">← Volver</button>
-        <h2 class="text-2xl font-bold text-blue-900 mb-6">Detalles de la Actividad</h2>
-        <div class="bg-white p-6 rounded-3xl shadow-lg space-y-4">
-            <div>
-                <label class="block text-gray-600 font-bold mb-2 text-sm">Fecha:</label>
-                <input type="date" id="event-date" class="w-full p-3 bg-gray-100 rounded-xl border-none">
-            </div>
-            <div>
-                <label class="block text-gray-600 font-bold mb-2 text-sm">Tipo de Actividad:</label>
-                <select id="event-type" class="w-full p-3 bg-gray-100 rounded-xl border-none">
-                    <option value="Ensayo">Ensayo</option>
-                    <option value="Retreta">Retreta (Cada 20 días)</option>
-                    <option value="Concierto">Concierto / Gala</option>
-                    <option value="Desfile">Desfile / Acto Cívico</option>
-                </select>
-            </div>
-            <button onclick="startAttendance()" class="w-full bg-blue-900 text-white p-4 rounded-2xl font-bold shadow-lg mt-4">EMPEZAR PASE DE LISTA</button>
-        </div>
-    </div>
-
-    <div id="screen-list" class="hidden min-h-screen">
-        <header class="bg-blue-900 text-white p-4 sticky top-0 z-20">
-            <div class="flex justify-between items-center mb-4">
-                <h2 id="header-process-title" class="font-black italic">BANDA TITULAR</h2>
-                <button onclick="location.reload()" class="text-xs bg-blue-800 px-3 py-1 rounded-lg">Cerrar Sesión</button>
-            </div>
-            <input type="text" id="search-bar" onkeyup="filterNames()" placeholder="🔍 Buscar músico..." class="w-full p-3 rounded-xl text-black shadow-inner">
-        </header>
-
-        <div class="flex bg-white overflow-x-auto border-b sticky top-[124px] z-10 shadow-sm">
-            <button onclick="filterByFamily('MADERAS')" class="tab-btn p-4 flex-none w-1/4 font-bold active-tab">MADERAS</button>
-            <button onclick="filterByFamily('BRONCES')" class="tab-btn p-4 flex-none w-1/4 font-bold text-gray-400">BRONCES</button>
-            <button onclick="filterByFamily('CUERDAS')" class="tab-btn p-4 flex-none w-1/4 font-bold text-gray-400">CUERDAS</button>
-            <button onclick="filterByFamily('PERCUSION')" class="tab-btn p-4 flex-none w-1/4 font-bold text-gray-400">PERCUSIÓN</button>
+        <div id="event-description-div" class="hidden bg-blue-50 p-4 rounded-xl">
+            <label class="block text-sm font-bold text-blue-900 mb-2">Descripción del Evento:</label>
+            <input type="text" id="event-desc" placeholder="Ej: Retreta Parque Principal" class="w-full p-3 rounded-lg border-blue-200 border">
         </div>
 
-        <div id="list-container" class="p-4 mb-32 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            </div>
-
-        <div class="fixed bottom-0 left-0 right-0 bg-white p-5 border-t shadow-2xl flex justify-between items-center">
-            <div class="text-sm font-medium text-gray-500">
-                <span id="summary-count">0</span> Marcados
-            </div>
-            <button onclick="finishAndSync()" class="bg-green-600 text-white px-10 py-4 rounded-2xl font-black shadow-lg">GUARDAR TODO</button>
-        </div>
+        <button onclick="showProcessSelection()" class="w-full bg-blue-900 text-white p-4 rounded-2xl font-bold shadow-lg">SIGUIENTE</button>
     </div>
 
     <script>
-        let currentProcess = "";
-        let attendanceData = {};
+        let config = JSON.parse(localStorage.getItem('band_cfg')) || { name: "Banda Sinfónica", pin: "paisa" };
+        let currentActivity = "";
 
-        // Simulación de Músicos por Proceso
-        const baseDeDatos = [
-            { nombre: "Juan Flauta", instrumento: "Flauta", familia: "MADERAS", proceso: "PREBANDA" },
-            { nombre: "Andrés Trompeta", instrumento: "Trompeta", familia: "BRONCES", proceso: "BANDA TITULAR" },
-            { nombre: "María Clarinete", instrumento: "Clarinete", familia: "MADERAS", proceso: "BANDA INFANTIL" },
-            { nombre: "Tuba Master", instrumento: "Tuba", familia: "BRONCES", proceso: "BANDA TITULAR" }
-        ];
+        window.onload = () => {
+            document.getElementById('display-band-name').innerText = config.name;
+            document.getElementById('cfg-band-name').value = config.name;
+        };
 
         function checkPin() {
-            if(document.getElementById('pin-input').value === "paisa") {
-                showScreen('screen-process');
-            } else { alert("PIN Incorrecto"); }
+            if(document.getElementById('pin-input').value === config.pin) showMenu();
+            else alert("PIN incorrecto");
         }
 
-        function selectProcess(proceso) {
-            currentProcess = proceso;
-            document.getElementById('header-process-title').innerText = proceso;
-            // Poner fecha de hoy por defecto
-            document.getElementById('event-date').valueAsDate = new Date();
-            showScreen('screen-event');
+        function showMenu() { hideAll(); document.getElementById('screen-menu').classList.remove('hidden'); }
+        function showConfig() { hideAll(); document.getElementById('screen-config').classList.remove('hidden'); }
+        function goToProcessSelection() { hideAll(); document.getElementById('screen-activity').classList.remove('hidden'); }
+        
+        function toggleEventInput() {
+            currentActivity = "Evento";
+            document.getElementById('event-description-div').classList.remove('hidden');
         }
 
-        function startAttendance() {
-            showScreen('screen-list');
-            filterByFamily('MADERAS');
+        function setActivity(type) {
+            currentActivity = type;
+            document.getElementById('event-description-div').classList.add('hidden');
+            document.getElementById('event-desc').value = type;
         }
 
-        function renderList(familia) {
-            const container = document.getElementById('list-container');
-            container.innerHTML = "";
-            const filtrados = baseDeDatos.filter(m => m.familia === familia && m.proceso === currentProcess);
-            
-            if(filtrados.length === 0) {
-                container.innerHTML = "<p class='text-center text-gray-400 mt-10'>No hay músicos en esta sección para este proceso.</p>";
-            }
+        function saveConfig() {
+            config.name = document.getElementById('cfg-band-name').value;
+            localStorage.setItem('band_cfg', JSON.stringify(config));
+            location.reload();
+        }
 
-            filtrados.forEach(m => {
-                const div = document.createElement('div');
-                div.className = "card-musico bg-white p-4 rounded-2xl shadow-sm border border-gray-100";
-                div.innerHTML = `
-                    <div class="mb-3">
-                        <p class="font-bold text-gray-900">${m.nombre}</p>
-                        <p class="text-xs text-blue-600 font-bold">${m.instrumento}</p>
-                    </div>
-                    <div class="grid grid-cols-4 gap-2">
-                        ${['P','A','R','E'].map(s => `<button onclick="mark('${m.nombre}','${s}', this)" class="py-2 rounded-xl border font-black text-gray-400 bg-gray-50 text-xs">${s}</button>`).join('')}
-                    </div>
-                `;
-                container.appendChild(div);
+        function hideAll() {
+            ['screen-pin', 'screen-menu', 'screen-config', 'screen-activity'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
             });
         }
 
-        function mark(nombre, status, btn) {
-            attendanceData[nombre] = status;
-            const buttons = btn.parentElement.querySelectorAll('button');
-            buttons.forEach(b => b.className = "py-2 rounded-xl border font-black text-gray-400 bg-gray-50 text-xs");
-            
-            const colors = { 'P': 'bg-green-500 text-white border-green-500', 'A': 'bg-red-500 text-white border-red-500', 'R': 'bg-yellow-500 text-white border-yellow-500', 'E': 'bg-blue-400 text-white border-blue-400' };
-            btn.className = `py-2 rounded-xl border font-black text-xs ${colors[status]} shadow-md transform scale-105 transition-all`;
-            
-            document.getElementById('summary-count').innerText = Object.keys(attendanceData).length;
-        }
-
-        function filterByFamily(fam) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.replace('active-tab', 'text-gray-400'));
-            event.target.classList.add('active-tab');
-            renderList(fam);
-        }
-
-        function filterNames() {
-            const q = document.getElementById('search-bar').value.toLowerCase();
-            document.querySelectorAll('.card-musico').forEach(card => {
-                card.style.display = card.innerText.toLowerCase().includes(q) ? "block" : "none";
-            });
-        }
-
-        function showScreen(id) {
-            ['screen-pin', 'screen-process', 'screen-event', 'screen-list'].forEach(s => document.getElementById(s).classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-        }
-
-        function backToProcess() { showScreen('screen-process'); }
-
-        function finishAndSync() {
-            alert("✅ Asistencia Guardada.\nProceso: " + currentProcess + "\nActividad: " + document.getElementById('event-type').value);
-            // Aquí se disparará la conexión al Sheets próximamente
+        function showProcessSelection() {
+            const desc = document.getElementById('event-desc').value;
+            if(!desc) { alert("Por favor escribe una descripción"); return; }
+            alert("Iniciando asistencia para: " + desc);
+            // Aquí seguiría el flujo a Prebanda/Infantil/Titular
         }
     </script>
 </body>
