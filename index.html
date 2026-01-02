@@ -20,14 +20,10 @@
         .bg-percusion { background-color: #F8FAFC; border-left: 6px solid #94A3B8; }
 
         .btn-status { font-size: 10px; font-weight: 800; color: #334155; border: 1px solid #E2E8F0; }
-        .card-musico { transition: transform 0.2s ease; }
-        
-        /* Estilo unificado para el botón atrás */
-        .btn-atras { font-size: 10px; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.2s; }
-        .btn-atras:hover { color: #1E3A8A; }
+        .btn-atras { font-size: 10px; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.1em; }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col">
 
     <div id="loader" class="hidden fixed inset-0 bg-slate-50/90 z-50 flex flex-col items-center justify-center">
         <div class="loader ease-linear rounded-full border-4 border-t-4 border-slate-200 h-14 w-14 mb-4"></div>
@@ -40,34 +36,36 @@
             <h1 class="text-2xl font-black text-slate-800 mb-1 uppercase tracking-tight">ATRIL DIGITAL</h1>
             <p class="text-slate-400 text-[9px] mb-10 uppercase tracking-[0.3em] font-bold">GESTIÓN PROFESIONAL</p>
             <div class="space-y-4">
-                <input type="text" id="user-input" placeholder="USUARIO" class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-blue-500 font-bold text-sm">
-                <input type="password" id="pass-input" placeholder="CONTRASEÑA" class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-blue-500 text-center text-2xl tracking-widest">
-                <button onclick="loginProcess()" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-extrabold shadow-lg transition-all text-xs tracking-widest uppercase">INGRESAR</button>
+                <input type="text" id="user-input" placeholder="USUARIO" class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-blue-500 font-bold text-sm text-center tracking-widest uppercase">
+                <input type="password" id="pass-input" placeholder="CONTRASEÑA" class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-blue-500 font-bold text-sm text-center tracking-widest uppercase">
+                <button onclick="loginProcess()" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-extrabold shadow-lg text-xs tracking-widest uppercase mt-2">INGRESAR</button>
             </div>
             <p id="login-error" class="text-red-500 text-[10px] mt-6 hidden font-bold uppercase">DATOS INCORRECTOS</p>
         </div>
     </div>
 
-    <div id="screen-menu" class="hidden p-6 max-w-md mx-auto">
+    <div id="screen-menu" class="hidden flex-col min-h-screen p-6 max-w-md mx-auto w-full">
         <div class="flex justify-between items-center mb-10 mt-4">
             <h2 id="display-band-name" class="text-xl font-extrabold text-slate-800 uppercase tracking-tight"></h2>
             <button onclick="logout()" class="text-red-500 text-[9px] font-black uppercase border border-red-100 px-3 py-1 rounded-lg">SALIR</button>
         </div>
         
-        <button onclick="nav('screen-activity')" class="w-full bg-white p-8 rounded-[35px] shadow-sm border border-slate-100 flex justify-between items-center mb-10">
-            <div class="text-left">
-                <p class="font-black text-slate-900 text-lg uppercase">ASISTENCIA</p>
-                <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">NUEVO REGISTRO</p>
-            </div>
-            <div class="bg-blue-50 p-4 rounded-2xl text-2xl">📋</div>
-        </button>
+        <div class="flex-grow">
+            <button onclick="nav('screen-activity')" class="w-full bg-white p-8 rounded-[35px] shadow-sm border border-slate-100 flex justify-between items-center">
+                <div class="text-left">
+                    <p class="font-black text-slate-900 text-lg uppercase">ASISTENCIA</p>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">NUEVO REGISTRO</p>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-2xl text-2xl">📋</div>
+            </button>
+        </div>
 
-        <div class="flex justify-center opacity-90">
-            <img src="https://github.com/paisatuba1/Asistencia-Banda/blob/main/logo.png?raw=true" alt="Logo" class="max-w-[180px]">
+        <div class="flex justify-center pb-10 opacity-90">
+            <img src="https://github.com/paisatuba1/Asistencia-Banda/blob/main/logo.png?raw=true" alt="Logo" class="max-w-[160px]">
         </div>
     </div>
 
-    <div id="screen-activity" class="hidden p-6 max-w-md mx-auto">
+    <div id="screen-activity" class="hidden p-6 max-w-md mx-auto w-full">
         <div class="flex justify-start mb-6">
             <button onclick="nav('screen-menu')" class="btn-atras">← ATRÁS</button>
         </div>
@@ -92,19 +90,19 @@
         </div>
     </div>
 
-    <div id="screen-process" class="hidden p-6 max-w-md mx-auto">
+    <div id="screen-process" class="hidden p-6 max-w-md mx-auto w-full">
         <div class="flex justify-start mb-6">
             <button onclick="nav('screen-activity')" class="btn-atras">← ATRÁS</button>
         </div>
         <div class="text-center space-y-4">
-            <h2 class="text-lg font-extrabold mb-8 text-slate-800 uppercase tracking-widest">SELECCIONE NIVEL</h2>
+            <h2 class="text-lg font-extrabold mb-8 text-slate-800 uppercase tracking-widest">SELECCIONE PROCESO</h2>
             <button onclick="initAttendance('PREBANDA')" class="w-full p-6 bg-white rounded-3xl shadow-sm font-extrabold text-left border-l-8 border-green-400 uppercase text-xs">PREBANDA</button>
             <button onclick="initAttendance('BANDA INFANTIL')" class="w-full p-6 bg-white rounded-3xl shadow-sm font-extrabold text-left border-l-8 border-blue-400 uppercase text-xs">BANDA INFANTIL</button>
             <button onclick="initAttendance('BANDA TITULAR')" class="w-full p-6 bg-white rounded-3xl shadow-sm font-extrabold text-left border-l-8 border-slate-700 uppercase text-xs">BANDA TITULAR</button>
         </div>
     </div>
 
-    <div id="screen-list" class="hidden min-h-screen pb-44">
+    <div id="screen-list" class="hidden min-h-screen pb-44 w-full">
         <div class="bg-white/90 backdrop-blur-md p-5 sticky top-0 z-20 border-b border-slate-100">
             <div class="flex justify-between items-center mb-4">
                 <button onclick="nav('screen-process')" class="btn-atras">← ATRÁS</button>
@@ -122,11 +120,13 @@
             </div>
         </div>
 
-        <div id="musicos-box" class="p-5 space-y-4"></div>
+        <div id="musicos-box" class="p-5 space-y-4 max-w-md mx-auto"></div>
 
-        <div class="fixed bottom-0 bg-white/95 backdrop-blur-sm w-full p-6 border-t border-slate-100 shadow-2xl flex gap-3">
-            <button onclick="confirmFinalize()" class="flex-[2] bg-blue-900 text-white p-5 rounded-2xl font-black uppercase tracking-widest text-[10px]">GUARDAR DRIVE</button>
-            <button onclick="whatsappReport()" class="flex-1 bg-emerald-500 text-white p-5 rounded-2xl font-black text-center text-[10px] tracking-widest">WHATSAPP</button>
+        <div class="fixed bottom-0 bg-white/95 backdrop-blur-sm w-full p-6 border-t border-slate-100 shadow-2xl flex gap-3 justify-center">
+            <div class="flex gap-3 w-full max-w-md">
+                <button onclick="confirmFinalize()" class="flex-[2] bg-blue-900 text-white p-5 rounded-2xl font-black uppercase tracking-widest text-[10px]">GUARDAR DRIVE</button>
+                <button onclick="whatsappReport()" class="flex-1 bg-emerald-500 text-white p-5 rounded-2xl font-black text-center text-[10px] tracking-widest">WHATSAPP</button>
+            </div>
         </div>
     </div>
 
@@ -204,8 +204,12 @@
         }
 
         function nav(id) {
-            document.querySelectorAll('body > div').forEach(d => d.id !== 'loader' && d.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
+            document.querySelectorAll('body > div').forEach(d => {
+                if(d.id !== 'loader') d.classList.add('hidden');
+            });
+            const target = document.getElementById(id);
+            target.classList.remove('hidden');
+            if(id === 'screen-menu') target.style.display = 'flex';
             if(id === 'screen-activity') document.getElementById('event-date').valueAsDate = new Date();
             if(id === 'screen-list') renderSection(currentFamily);
         }
