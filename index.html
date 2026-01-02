@@ -3,130 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sinfónica App</title>
+    <title>Gestión de Banda - Director</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .hidden { display: none; }
         .active-tab { border-bottom: 4px solid #1e40af; color: #1e40af; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen font-sans">
+<body class="bg-slate-100 min-h-screen">
 
-    <div id="screen-pin" class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-sm text-center border-t-8 border-blue-900">
-            <h1 id="display-band-name" class="text-2xl font-black text-gray-800 mb-6 uppercase">Banda Sinfónica</h1>
-            <input type="password" id="pin-input" placeholder="PIN" class="w-full p-4 border rounded-2xl mb-4 text-center text-2xl tracking-widest">
-            <button onclick="checkPin()" class="w-full bg-blue-900 text-white p-4 rounded-2xl font-bold shadow-lg">ENTRAR</button>
+    <div id="screen-login" class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-sm border-t-8 border-blue-900">
+            <h1 id="view-band-name" class="text-xl font-black text-center mb-6 uppercase text-slate-700">Mi Banda Sinfónica</h1>
+            <input type="text" id="user-input" placeholder="Usuario" class="w-full p-4 border rounded-2xl mb-3 outline-none focus:ring-2 ring-blue-500">
+            <input type="password" id="pass-input" placeholder="Contraseña" class="w-full p-4 border rounded-2xl mb-4 outline-none focus:ring-2 ring-blue-500">
+            <button onclick="login()" class="w-full bg-blue-900 text-white p-4 rounded-2xl font-bold hover:bg-blue-800 transition">ENTRAR</button>
+            <p id="login-error" class="text-red-500 text-sm mt-3 hidden text-center">Datos incorrectos</p>
         </div>
     </div>
 
     <div id="screen-menu" class="hidden p-6 max-w-md mx-auto space-y-4">
-        <h2 class="text-xl font-bold text-blue-900 mb-4">Panel del Director</h2>
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-slate-800 italic">Panel de Control</h2>
+            <button onclick="logout()" class="text-xs text-red-500 font-bold uppercase">Salir</button>
+        </div>
         
-        <button onclick="goToProcessSelection()" class="w-full bg-white p-6 rounded-2xl shadow-sm border-l-4 border-green-500 flex items-center justify-between">
+        <button onclick="startFlow()" class="w-full bg-white p-6 rounded-3xl shadow-sm border-l-8 border-blue-600 flex justify-between items-center">
             <div class="text-left">
-                <p class="font-bold text-lg text-gray-800">Tomar Asistencia</p>
-                <p class="text-sm text-gray-500">Ensayos o Presentaciones</p>
+                <p class="font-black text-slate-800">PASAR LISTA</p>
+                <p class="text-xs text-slate-400">Ensayos o Presentaciones</p>
             </div>
             <span class="text-2xl">📝</span>
         </button>
 
-        <button onclick="alert('Próximamente: Lista de eventos realizados')" class="w-full bg-white p-6 rounded-2xl shadow-sm border-l-4 border-blue-500 flex items-center justify-between">
+        <button id="btn-config" onclick="showConfig()" class="w-full bg-white p-6 rounded-3xl shadow-sm border-l-8 border-slate-400 flex justify-between items-center hidden">
             <div class="text-left">
-                <p class="font-bold text-lg text-gray-800">Historial de Eventos</p>
-                <p class="text-sm text-gray-500">Ver conciertos pasados</p>
-            </div>
-            <span class="text-2xl">🎺</span>
-        </button>
-
-        <button onclick="showConfig()" class="w-full bg-white p-6 rounded-2xl shadow-sm border-l-4 border-gray-400 flex items-center justify-between">
-            <div class="text-left">
-                <p class="font-bold text-lg text-gray-800">Configuración</p>
-                <p class="text-sm text-gray-500">Nombre de banda y Drive</p>
+                <p class="font-black text-slate-800">CONFIGURACIÓN</p>
+                <p class="text-xs text-slate-400">Usuarios y Google Sheets</p>
             </div>
             <span class="text-2xl">⚙️</span>
         </button>
     </div>
 
-    <div id="screen-config" class="hidden p-6 max-w-md mx-auto">
-        <button onclick="showMenu()" class="mb-4 text-blue-600 font-bold">← Volver</button>
-        <div class="bg-white p-6 rounded-2xl shadow-lg">
-            <label class="block font-bold mb-2">Nombre de la Banda:</label>
-            <input type="text" id="cfg-band-name" class="w-full p-3 border rounded-xl mb-4">
-            <button onclick="saveConfig()" class="w-full bg-blue-900 text-white p-3 rounded-xl font-bold">Guardar Cambios</button>
+    <div id="screen-config" class="hidden p-6 max-w-md mx-auto pb-20">
+        <button onclick="showMenu()" class="text-blue-600 font-bold mb-4">← Volver</button>
+        <div class="bg-white p-6 rounded-3xl shadow-lg space-y-4">
+            <h3 class="font-bold border-b pb-2">Datos de la Banda</h3>
+            <input type="text" id="cfg-band-name" placeholder="Nombre de la Banda" class="w-full p-3 border rounded-xl">
+            
+            <h3 class="font-bold border-b pb-2 mt-4">Asistentes</h3>
+            <div class="space-y-2">
+                <input type="text" id="cfg-asist1-user" placeholder="Usuario Asistente 1" class="w-full p-2 border rounded-lg text-sm">
+                <input type="password" id="cfg-asist1-pass" placeholder="Clave Asistente 1" class="w-full p-2 border rounded-lg text-sm">
+                <hr>
+                <input type="text" id="cfg-asist2-user" placeholder="Usuario Asistente 2" class="w-full p-2 border rounded-lg text-sm">
+                <input type="password" id="cfg-asist2-pass" placeholder="Clave Asistente 2" class="w-full p-2 border rounded-lg text-sm">
+            </div>
+            <button onclick="saveConfig()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-bold mt-4">GUARDAR CONFIGURACIÓN</button>
         </div>
     </div>
 
-    <div id="screen-activity" class="hidden p-6 max-w-md mx-auto space-y-6">
-        <button onclick="showMenu()" class="text-blue-600 font-bold">← Volver</button>
-        <h2 class="text-2xl font-bold text-gray-800">¿Qué actividad es hoy?</h2>
-        
-        <div class="flex gap-4">
-            <button onclick="setActivity('Ensayo')" class="flex-1 bg-white p-6 rounded-2xl shadow-md border-2 border-transparent focus:border-blue-500">
-                <span class="text-3xl block">🎼</span>
-                <span class="font-bold">ENSAYO</span>
-            </button>
-            <button onclick="toggleEventInput()" class="flex-1 bg-white p-6 rounded-2xl shadow-md border-2 border-transparent focus:border-blue-500">
-                <span class="text-3xl block">🏟️</span>
-                <span class="font-bold">EVENTO</span>
-            </button>
+    <div id="screen-activity" class="hidden p-6 max-w-md mx-auto">
+        <h2 class="text-2xl font-black mb-6">¿Qué registramos hoy?</h2>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <button onclick="selectAct('Ensayo')" class="p-6 bg-white rounded-3xl shadow-md border-2 border-transparent focus:border-blue-600 font-bold">ENSAYO</button>
+            <button onclick="selectAct('Evento')" class="p-6 bg-white rounded-3xl shadow-md border-2 border-transparent focus:border-blue-600 font-bold">EVENTO</button>
         </div>
-
-        <div id="event-description-div" class="hidden bg-blue-50 p-4 rounded-xl">
-            <label class="block text-sm font-bold text-blue-900 mb-2">Descripción del Evento:</label>
-            <input type="text" id="event-desc" placeholder="Ej: Retreta Parque Principal" class="w-full p-3 rounded-lg border-blue-200 border">
+        <div id="event-desc-box" class="hidden mb-6">
+            <input type="text" id="event-desc" placeholder="Nombre del evento (ej. Retreta)" class="w-full p-4 rounded-2xl border">
         </div>
+        <button onclick="goToProcess()" class="w-full bg-blue-900 text-white p-4 rounded-2xl font-bold">CONTINUAR</button>
+    </div>
 
-        <button onclick="showProcessSelection()" class="w-full bg-blue-900 text-white p-4 rounded-2xl font-bold shadow-lg">SIGUIENTE</button>
+    <div id="screen-process" class="hidden p-6 max-w-md mx-auto space-y-4">
+        <h2 class="text-xl font-bold italic">Seleccione Proceso:</h2>
+        <button onclick="openAttendance('PREBANDA')" class="w-full p-6 bg-white rounded-2xl shadow font-bold text-left border-r-4 border-green-400">PREBANDA</button>
+        <button onclick="openAttendance('BANDA INFANTIL')" class="w-full p-6 bg-white rounded-2xl shadow font-bold text-left border-r-4 border-blue-400">BANDA INFANTIL</button>
+        <button onclick="openAttendance('BANDA TITULAR')" class="w-full p-6 bg-white rounded-2xl shadow font-bold text-left border-r-4 border-slate-800">BANDA TITULAR</button>
+    </div>
+
+    <div id="screen-list" class="hidden min-h-screen pb-32">
+        <div class="bg-blue-900 text-white p-4 sticky top-0 z-20">
+            <p id="list-title" class="font-bold"></p>
+            <input type="text" id="search" onkeyup="filter()" placeholder="Buscar músico..." class="w-full mt-2 p-2 rounded text-black outline-none">
+        </div>
+        <div id="musicos-list" class="p-4 space-y-3"></div>
+        <div class="fixed bottom-0 bg-white w-full p-4 border-t shadow-2xl flex gap-2">
+            <button onclick="finish()" class="flex-1 bg-green-600 text-white p-4 rounded-xl font-bold">ENVIAR DRIVE</button>
+            <button onclick="whatsappReport()" class="bg-emerald-100 text-emerald-700 p-4 rounded-xl font-bold">WA</button>
+        </div>
     </div>
 
     <script>
-        let config = JSON.parse(localStorage.getItem('band_cfg')) || { name: "Banda Sinfónica", pin: "paisa" };
-        let currentActivity = "";
-
-        window.onload = () => {
-            document.getElementById('display-band-name').innerText = config.name;
-            document.getElementById('cfg-band-name').value = config.name;
+        // --- BASE DE DATOS LOCAL Y CONFIG ---
+        let config = JSON.parse(localStorage.getItem('band_config')) || {
+            name: "Mi Banda Sinfónica",
+            admin: { u: "paisa", p: "paisa" },
+            asist1: { u: "", p: "" },
+            asist2: { u: "", p: "" }
         };
 
-        function checkPin() {
-            if(document.getElementById('pin-input').value === config.pin) showMenu();
-            else alert("PIN incorrecto");
+        let currentSession = { user: "", process: "", actType: "", actName: "" };
+        let asistencia = JSON.parse(localStorage.getItem('temp_asistencia')) || {};
+
+        // Músicos de prueba (Esto vendrá del Sheets luego)
+        const musicosDB = [
+            { n: "Camilo Pérez", i: "Flauta", p: "PREBANDA", f: "MADERAS" },
+            { n: "Sara Gómez", i: "Clarinete", p: "BANDA TITULAR", f: "MADERAS" },
+            { n: "Marcos Tuba", i: "Tuba", p: "BANDA TITULAR", f: "BRONCES" }
+        ];
+
+        window.onload = () => { document.getElementById('view-band-name').innerText = config.name; };
+
+        function login() {
+            const u = document.getElementById('user-input').value;
+            const p = document.getElementById('pass-input').value;
+            
+            if((u === config.admin.u && p === config.admin.p) || 
+               (u === config.asist1.u && p === config.asist1.p) || 
+               (u === config.asist2.u && p === config.asist2.p)) {
+                
+                currentSession.user = u;
+                hideAll();
+                document.getElementById('screen-menu').classList.remove('hidden');
+                if(u === config.admin.u) document.getElementById('btn-config').classList.remove('hidden');
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
         }
 
-        function showMenu() { hideAll(); document.getElementById('screen-menu').classList.remove('hidden'); }
         function showConfig() { hideAll(); document.getElementById('screen-config').classList.remove('hidden'); }
-        function goToProcessSelection() { hideAll(); document.getElementById('screen-activity').classList.remove('hidden'); }
-        
-        function toggleEventInput() {
-            currentActivity = "Evento";
-            document.getElementById('event-description-div').classList.remove('hidden');
-        }
-
-        function setActivity(type) {
-            currentActivity = type;
-            document.getElementById('event-description-div').classList.add('hidden');
-            document.getElementById('event-desc').value = type;
-        }
-
         function saveConfig() {
             config.name = document.getElementById('cfg-band-name').value;
-            localStorage.setItem('band_cfg', JSON.stringify(config));
+            config.asist1.u = document.getElementById('cfg-asist1-user').value;
+            config.asist1.p = document.getElementById('cfg-asist1-pass').value;
+            config.asist2.u = document.getElementById('cfg-asist2-user').value;
+            config.asist2.p = document.getElementById('cfg-asist2-pass').value;
+            localStorage.setItem('band_config', JSON.stringify(config));
+            alert("Configuración guardada");
             location.reload();
         }
 
-        function hideAll() {
-            ['screen-pin', 'screen-menu', 'screen-config', 'screen-activity'].forEach(id => {
-                document.getElementById(id).classList.add('hidden');
+        function selectAct(t) {
+            currentSession.actType = t;
+            document.getElementById('event-desc-box').className = (t === 'Evento') ? 'block mb-6' : 'hidden';
+            if(t === 'Ensayo') document.getElementById('event-desc').value = "Ensayo Regular";
+        }
+
+        function goToProcess() { hideAll(); document.getElementById('screen-process').classList.remove('hidden'); }
+        
+        function openAttendance(p) {
+            currentSession.process = p;
+            currentSession.actName = document.getElementById('event-desc').value;
+            hideAll();
+            document.getElementById('screen-list').classList.remove('hidden');
+            document.getElementById('list-title').innerText = p + " - " + currentSession.actName;
+            render();
+        }
+
+        function render() {
+            const cont = document.getElementById('musicos-list');
+            cont.innerHTML = "";
+            musicosDB.filter(m => m.p === currentSession.process).forEach(m => {
+                const sel = asistencia[m.n] || '';
+                const div = document.createElement('div');
+                div.className = "bg-white p-4 rounded-2xl shadow-sm flex flex-col gap-2";
+                div.innerHTML = `<p class='font-bold'>${m.n} <span class='text-[10px] text-blue-500'>${m.i}</span></p>
+                    <div class='grid grid-cols-4 gap-2'>
+                        ${['P','A','R','E'].map(s => `<button onclick="mark('${m.n}','${s}', this)" class="p-2 rounded-lg border font-bold ${sel===s?'bg-blue-600 text-white':'bg-slate-50 text-slate-400'}">${s}</button>`).join('')}
+                    </div>`;
+                cont.appendChild(div);
             });
         }
 
-        function showProcessSelection() {
-            const desc = document.getElementById('event-desc').value;
-            if(!desc) { alert("Por favor escribe una descripción"); return; }
-            alert("Iniciando asistencia para: " + desc);
-            // Aquí seguiría el flujo a Prebanda/Infantil/Titular
+        function mark(n, s, btn) {
+            asistencia[n] = s;
+            localStorage.setItem('temp_asistencia', JSON.stringify(asistencia));
+            render();
         }
+
+        function whatsappReport() {
+            const ausentes = musicosDB.filter(m => m.p === currentSession.process && asistencia[m.n] === 'A').map(m => m.n);
+            let txt = `📢 *REPORTE DE AUSENCIAS - ${config.name}*\nProceso: ${currentSession.process}\nActividad: ${currentSession.actName}\n\nNo asistieron:\n`;
+            ausentes.forEach(a => txt += `- ${a}\n`);
+            window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`);
+        }
+
+        function finish() {
+            if(confirm("¿Deseas guardar la asistencia en Google Drive?")) {
+                alert("Sincronizando... (Aquí conectaremos con el Excel en el siguiente paso)");
+                localStorage.removeItem('temp_asistencia');
+                asistencia = {};
+                location.reload();
+            }
+        }
+
+        function hideAll() { 
+            document.querySelectorAll('body > div').forEach(d => d.classList.add('hidden')); 
+        }
+        function showMenu() { hideAll(); document.getElementById('screen-menu').classList.remove('hidden'); }
+        function logout() { location.reload(); }
     </script>
 </body>
 </html>
