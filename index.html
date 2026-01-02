@@ -3,122 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asistencia Banda Sinfónica</title>
+    <title>Banda Sinfónica - Gestión</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .hidden { display: none; }
         .active-tab { border-bottom: 4px solid #2563eb; color: #2563eb; }
+        .status-selected { outline: 3px solid black; transform: scale(1.05); }
     </style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-100 min-h-screen">
 
-    <div id="login-screen" class="flex flex-col items-center justify-center min-h-screen p-6">
-        <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-sm text-center">
-            <h1 class="text-2xl font-bold mb-6 text-gray-800">Director de Banda</h1>
-            <p class="mb-4 text-gray-600">Ingresa el PIN de acceso</p>
-            <input type="password" id="pin-input" placeholder="PIN" class="w-full p-3 border rounded-lg mb-4 text-center text-xl tracking-widest">
-            <button onclick="checkPin()" class="w-full bg-blue-600 text-white p-3 rounded-lg font-bold hover:bg-blue-700 transition">Entrar</button>
-            <p id="error-msg" class="text-red-500 mt-3 hidden">PIN incorrecto</p>
+    <div id="login-screen" class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+            <h1 id="band-name-display" class="text-2xl font-bold text-center mb-6 text-blue-800">Director de Banda</h1>
+            <input type="password" id="pin-input" placeholder="PIN de acceso" class="w-full p-4 border rounded-xl mb-4 text-center text-2xl tracking-[1em]">
+            <button onclick="checkPin()" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold text-lg shadow-lg">Entrar</button>
+            <button onclick="showConfig()" class="w-full mt-4 text-gray-400 text-sm italic underline">Configurar Base de Datos</button>
         </div>
     </div>
 
-    <div id="app-screen" class="hidden min-h-screen pb-20">
-        <header class="bg-blue-800 text-white p-4 shadow-md sticky top-0 z-10">
-            <h2 class="text-xl font-bold">Control de Asistencia</h2>
-            <p id="current-date" class="text-sm opacity-80"></p>
+    <div id="config-screen" class="hidden p-6 max-w-md mx-auto">
+        <h2 class="text-xl font-bold mb-4">Configuración del Sistema</h2>
+        <div class="bg-white p-6 rounded-xl shadow-md">
+            <label class="block mb-2 font-semibold">Nombre de la Banda:</label>
+            <input type="text" id="cfg-name" class="w-full p-2 border rounded mb-4" placeholder="Ej: Sinfónica de Antioquia">
+            
+            <label class="block mb-2 font-semibold">URL de Google Web App (API):</label>
+            <input type="text" id="cfg-url" class="w-full p-2 border rounded mb-4" placeholder="https://script.google.com/...">
+            
+            <button onclick="saveConfig()" class="w-full bg-green-600 text-white p-3 rounded font-bold">Guardar y Reiniciar</button>
+            <button onclick="hideConfig()" class="w-full mt-2 text-red-500">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="app-screen" class="hidden">
+        <header class="bg-blue-900 text-white p-4 sticky top-0 z-20 shadow-lg">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="font-bold uppercase tracking-wider">Pase de Lista</h2>
+                <span id="status-icon" class="text-xs bg-green-500 px-2 py-1 rounded">Online</span>
+            </div>
+            <input type="text" id="search-bar" onkeyup="filterNames()" placeholder="🔍 Buscar músico..." class="w-full p-2 rounded-lg text-black">
         </header>
 
-        <div class="flex bg-white shadow-sm overflow-x-auto">
-            <button onclick="showSection('MADERAS')" class="tab-btn flex-1 p-4 font-bold text-sm active-tab">MADERAS</button>
-            <button onclick="showSection('BRONCES')" class="tab-btn flex-1 p-4 font-bold text-sm text-gray-500">BRONCES</button>
-            <button onclick="showSection('CUERDAS')" class="tab-btn flex-1 p-4 font-bold text-sm text-gray-500">CUERDAS</button>
-            <button onclick="showSection('PERCUSION')" class="tab-btn flex-1 p-4 font-bold text-sm text-gray-500">PERCUSIÓN</button>
+        <div class="flex bg-white overflow-x-auto border-b sticky top-[108px] z-10">
+            <button onclick="filterByFamily('MADERAS')" class="tab-btn p-4 flex-none w-1/4 font-bold active-tab">MADERAS</button>
+            <button onclick="filterByFamily('BRONCES')" class="tab-btn p-4 flex-none w-1/4 font-bold text-gray-400">BRONCES</button>
+            <button onclick="filterByFamily('CUERDAS')" class="tab-btn p-4 flex-none w-1/4 font-bold text-gray-400">CUERDAS</button>
+            <button onclick="filterByFamily('PERCUSION')" class="tab-btn p-4 flex-none w-1/4 font-bold text-gray-400">PERCUSIÓN</button>
         </div>
 
-        <div id="list-container" class="p-4">
+        <div id="list-container" class="p-4 mb-24 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             </div>
 
-        <button onclick="sendData()" class="fixed bottom-6 right-6 bg-green-600 text-white px-6 py-4 rounded-full shadow-2xl font-bold flex items-center gap-2 hover:bg-green-700">
-            <span>Guardar en Drive</span>
-        </button>
+        <div class="fixed bottom-0 left-0 right-0 bg-white p-4 border-t flex justify-between items-center shadow-[0_-5px_15px_rgba(0,0,0,0.1)]">
+            <div class="text-xs text-gray-500">
+                Pendientes por enviar: <span id="offline-count" class="font-bold text-orange-600">0</span>
+            </div>
+            <button onclick="syncData()" id="btn-sync" class="bg-green-600 text-white px-8 py-3 rounded-xl font-bold shadow-md active:scale-95 transition-transform">
+                GUARDAR ASISTENCIA
+            </button>
+        </div>
     </div>
 
     <script>
-        const PIN_CORRECTO = "paisa";
-        const fechaActual = new Date().toLocaleDateString();
-        document.getElementById('current-date').innerText = fechaActual;
+        // --- CONFIGURACIÓN INICIAL ---
+        let db = JSON.parse(localStorage.getItem('band_config')) || {
+            name: "Banda Sinfónica",
+            apiUrl: "",
+            pin: "paisa"
+        };
 
-        // Base de datos de ejemplo (esto luego lo traeremos de Sheets)
+        // Simulación de base de datos de músicos (En la fase final esto se descarga del Sheets)
         const musicos = [
-            { nombre: "Juan Pérez", instrumento: "Flauta", familia: "MADERAS" },
-            { nombre: "María García", instrumento: "Clarinete", familia: "MADERAS" },
-            { nombre: "Carlos Ruiz", instrumento: "Trompeta", familia: "BRONCES" },
-            { nombre: "Ana López", instrumento: "Cello", familia: "CUERDAS" },
-            { nombre: "Luis Rivas", instrumento: "Redoblante", familia: "PERCUSION" }
+            { id: 1, nombre: "Juan Flautista", instrumento: "Flauta", familia: "MADERAS" },
+            { id: 2, nombre: "Andrés Oboe", instrumento: "Oboe", familia: "MADERAS" },
+            { id: 3, nombre: "Roberto Trompeta", instrumento: "Trompeta", familia: "BRONCES" },
+            { id: 4, nombre: "Elena Cello", instrumento: "Cello", familia: "CUERDAS" },
+            { id: 5, nombre: "Marcos Percu", instrumento: "Timbales", familia: "PERCUSION" }
         ];
+
+        let asistenciaDelDia = {};
+
+        // --- LÓGICA DE NAVEGACIÓN ---
+        window.onload = () => {
+            document.getElementById('band-name-display').innerText = db.name;
+        };
 
         function checkPin() {
             const input = document.getElementById('pin-input').value;
-            if(input === PIN_CORRECTO) {
+            if(input === db.pin) {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('app-screen').classList.remove('hidden');
-                showSection('MADERAS');
-            } else {
-                document.getElementById('error-msg').classList.remove('hidden');
+                renderList('MADERAS');
+            } else { alert("PIN Incorrecto"); }
+        }
+
+        function showConfig() { document.getElementById('login-screen').classList.add('hidden'); document.getElementById('config-screen').classList.remove('hidden'); }
+        function hideConfig() { document.getElementById('config-screen').classList.add('hidden'); document.getElementById('login-screen').classList.remove('hidden'); }
+        
+        function saveConfig() {
+            db.name = document.getElementById('cfg-name').value;
+            db.apiUrl = document.getElementById('cfg-url').value;
+            localStorage.setItem('band_config', JSON.stringify(db));
+            location.reload();
+        }
+
+        // --- LÓGICA DE ASISTENCIA ---
+        function renderList(familia) {
+            const container = document.getElementById('list-container');
+            container.innerHTML = "";
+            const filtrados = musicos.filter(m => m.familia === familia);
+            
+            filtrados.forEach(m => {
+                const div = document.createElement('div');
+                div.className = "musico-card bg-white p-4 rounded-xl shadow-sm border border-gray-100";
+                div.setAttribute('data-nombre', m.nombre.toLowerCase());
+                div.innerHTML = `
+                    <p class="font-bold text-gray-800">${m.nombre}</p>
+                    <p class="text-xs text-blue-500 mb-3">${m.instrumento}</p>
+                    <div class="flex gap-2">
+                        ${['P','A','R','E'].map(status => `
+                            <button onclick="mark('${m.nombre}', '${status}', this)" 
+                                class="btn-status flex-1 py-2 rounded border text-sm font-bold bg-gray-50 text-gray-400">
+                                ${status}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function mark(nombre, status, btn) {
+            asistenciaDelDia[nombre] = status;
+            const buttons = btn.parentElement.querySelectorAll('button');
+            buttons.forEach(b => b.className = "flex-1 py-2 rounded border text-sm font-bold bg-gray-50 text-gray-400");
+            
+            const colors = { 'P': 'bg-green-500 text-white', 'A': 'bg-red-500 text-white', 'R': 'bg-yellow-500 text-white', 'E': 'bg-blue-400 text-white' };
+            btn.className = `flex-1 py-2 rounded border text-sm font-bold ${colors[status]} shadow-inner scale-95`;
+        }
+
+        function filterNames() {
+            const query = document.getElementById('search-bar').value.toLowerCase();
+            document.querySelectorAll('.musico-card').forEach(card => {
+                const nombre = card.getAttribute('data-nombre');
+                card.style.display = nombre.includes(query) ? "block" : "none";
+            });
+        }
+
+        function filterByFamily(fam) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.replace('active-tab', 'text-gray-400'));
+            event.target.classList.add('active-tab');
+            renderList(fam);
+        }
+
+        // --- MODO OFFLINE Y SINCRONIZACIÓN ---
+        function syncData() {
+            const registro = {
+                fecha: new Date().toLocaleString(),
+                datos: asistenciaDelDia
+            };
+            
+            // Guardar en cola local (Offline first)
+            let cola = JSON.parse(localStorage.getItem('pending_sync')) || [];
+            cola.push(registro);
+            localStorage.setItem('pending_sync', JSON.stringify(cola));
+            
+            updateOfflineCount();
+            alert("Asistencia guardada en el dispositivo.");
+
+            // Intentar enviar al Sheets si hay URL configurada
+            if(db.apiUrl) {
+                sendToGoogle(registro);
             }
         }
 
-        function showSection(familia) {
-            // Actualizar estilo de pestañas
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active-tab');
-                btn.classList.add('text-gray-500');
-                if(btn.innerText.includes(familia)) {
-                    btn.classList.add('active-tab');
-                    btn.classList.remove('text-gray-500');
-                }
-            });
-
-            const container = document.getElementById('list-container');
-            container.innerHTML = "";
-
-            const filtrados = musicos.filter(m => m.familia === familia);
-
-            filtrados.forEach(m => {
-                const card = document.createElement('div');
-                card.className = "bg-white p-4 rounded-xl shadow-sm mb-3 flex flex-col gap-3";
-                card.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="font-bold text-gray-800">${m.nombre}</p>
-                            <p class="text-xs text-blue-600 font-semibold uppercase">${m.instrumento}</p>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-4 gap-2">
-                        <button onclick="setStatus(this, 'P')" class="text-xs p-2 border rounded font-bold bg-gray-50 text-gray-400">P</button>
-                        <button onclick="setStatus(this, 'A')" class="text-xs p-2 border rounded font-bold bg-gray-50 text-gray-400">A</button>
-                        <button onclick="setStatus(this, 'R')" class="text-xs p-2 border rounded font-bold bg-gray-50 text-gray-400">R</button>
-                        <button onclick="setStatus(this, 'E')" class="text-xs p-2 border rounded font-bold bg-gray-50 text-gray-400">E</button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
+        function updateOfflineCount() {
+            let cola = JSON.parse(localStorage.getItem('pending_sync')) || [];
+            document.getElementById('offline-count').innerText = cola.length;
         }
 
-        function setStatus(btn, status) {
-            // Limpiar hermanos
-            const parent = btn.parentElement;
-            parent.querySelectorAll('button').forEach(b => {
-                b.className = "text-xs p-2 border rounded font-bold bg-gray-50 text-gray-400";
-            });
-            
-            // Colorear activo
-            const colors = { 'P': 'bg-green-500 text-white', 'A': 'bg-red-500 text-white', 'R': 'bg-yellow-500 text-white', 'E': 'bg-blue-400 text-white' };
-            btn.className = `text-xs p-2 border rounded font-bold ${colors[status]}`;
-        }
-
-        function sendData() {
-            alert("¡Datos listos! En el siguiente paso configuraremos la conexión con tu Google Drive para que se guarden solos.");
+        function sendToGoogle(data) {
+            // Aquí irá la conexión Fetch real hacia Google Apps Script
+            console.log("Enviando a la nube...", data);
         }
     </script>
 </body>
