@@ -14,15 +14,14 @@
         .active-tab { border-bottom: 3px solid #1E3A8A; color: #1E3A8A; font-weight: 800; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* Colores sutiles por familia */
         .bg-maderas { background-color: #F0FDF4; border-left: 6px solid #4ADE80; }
         .bg-bronces { background-color: #FFFBEB; border-left: 6px solid #FBBF24; }
         .bg-cuerdas { background-color: #EFF6FF; border-left: 6px solid #60A5FA; }
         .bg-percusion { background-color: #F8FAFC; border-left: 6px solid #94A3B8; }
 
-        .btn-status { font-size: 10px; font-weight: 800; color: #334155; }
+        /* Botón de estado con línea delgada definida */
+        .btn-status { font-size: 10px; font-weight: 800; color: #334155; border: 1px solid #E2E8F0; }
         .card-musico { transition: transform 0.2s ease; }
-        .card-musico:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
@@ -40,7 +39,7 @@
             <div class="space-y-4">
                 <input type="text" id="user-input" placeholder="USUARIO" class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-blue-500 font-bold text-sm">
                 <input type="password" id="pass-input" placeholder="CONTRASEÑA" class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-blue-500 text-center text-2xl tracking-widest">
-                <button onclick="loginProcess()" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-extrabold hover:bg-black shadow-lg transition-all text-xs tracking-widest">INGRESAR</button>
+                <button onclick="loginProcess()" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-extrabold shadow-lg transition-all text-xs tracking-widest uppercase">INGRESAR</button>
             </div>
             <p id="login-error" class="text-red-500 text-[10px] mt-6 hidden font-bold uppercase">DATOS INCORRECTOS</p>
         </div>
@@ -110,7 +109,7 @@
                 <button onclick="renderSection('MADERAS')" class="tab-btn text-slate-300 pb-2">MADERAS</button>
                 <button onclick="renderSection('BRONCES')" class="tab-btn text-slate-300 pb-2">BRONCES</button>
                 <button onclick="renderSection('CUERDAS')" class="tab-btn text-slate-300 pb-2">CUERDAS</button>
-                <button onclick="renderSection('PERCUSIÓN')" class="tab-btn text-slate-300 pb-2">PERCUSIÓN</button>
+                <button onclick="renderSection('PERCUSIÓN')" class="tab-btn text-slate-300 pb-2 uppercase">PERCUSIÓN</button>
             </div>
         </div>
 
@@ -125,7 +124,6 @@
     <script>
         const MOTOR_URL = "https://script.google.com/macros/s/AKfycbxtkm0dnVBahNtdua02_0iK04_aYH8AzKFqwgm4r8NqeCeTjHpgSPZSB2wBK-LN86UK/exec";
         
-        // ORDEN JERÁRQUICO DE INSTRUMENTOS
         const INSTRUMENT_ORDER = [
             "FLAUTA", "OBOE", "FAGOT", "CLARINETE", "CLARIBAJO", "SAX ALTO", "SAX TENOR", "SAX BARÍTONO",
             "TROMPETA", "CORNO", "TROMBÓN", "EUFONIO", "TUBA",
@@ -175,13 +173,31 @@
                 const resp = await fetch(`${MOTOR_URL}?action=getIntegrantes&sheetId=${encodeURIComponent(session.sheetId)}`);
                 let data = await resp.json();
                 
-                // ORDENAR POR INSTRUMENTO SEGÚN LA LISTA MAESTRA
+                // LÓGICA DE ORDENAMIENTO TOLERANTE
                 session.masterList = data.sort((a, b) => {
-                    let indexA = INSTRUMENT_ORDER.indexOf(a.i.toUpperCase());
-                    let indexB = INSTRUMENT_ORDER.indexOf(b.i.toUpperCase());
-                    return (indexA === -1 ? 99 : indexA) - (indexB === -1 ? 99 : indexB);
+                    let instA = normalizeText(a.i);
+                    let instB = normalizeText(b.i);
+                    
+                    let indexA = findInstrumentIndex(instA);
+                    let indexB = findInstrumentIndex(instB);
+                    
+                    return indexA - indexB;
                 });
             } catch (e) { console.error("ERROR CARGANDO DATOS"); }
+        }
+
+        // Función para normalizar texto (quitar tildes y espacios)
+        function normalizeText(text) {
+            return text.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+        }
+
+        // Busca el índice del instrumento reconociendo palabras clave
+        function findInstrumentIndex(text) {
+            for (let i = 0; i < INSTRUMENT_ORDER.length; i++) {
+                let key = normalizeText(INSTRUMENT_ORDER[i]);
+                if (text.includes(key) || key.includes(text)) return i;
+            }
+            return 99; // Si no lo encuentra, al final
         }
 
         function nav(id) {
@@ -218,23 +234,23 @@
             
             const filtered = session.masterList.filter(m => 
                 m.p.trim().toUpperCase() === session.process.toUpperCase() && 
-                (fam === 'TODOS' || m.f.trim().toUpperCase() === fam.replace('PERCUSIÓN','PERCUSION').toUpperCase())
+                (fam === 'TODOS' || normalizeText(m.f).includes(normalizeText(fam)))
             );
 
             filtered.forEach(m => {
                 const sel = record[m.n] || '';
                 const card = document.createElement('div');
                 const famCls = getFamClass(m.f);
-                card.className = `card-musico p-5 rounded-[25px] shadow-sm ${famCls} transition-all`;
+                card.className = `card-musico p-5 rounded-[25px] shadow-sm ${famCls} transition-all border border-slate-100/50`;
                 card.innerHTML = `
                     <div class="mb-4">
-                        <p class="font-extrabold text-slate-800 text-sm leading-tight uppercase">${m.n}</p>
-                        <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-1">${m.i}</p>
+                        <p class="font-extrabold text-slate-800 text-[13px] leading-tight uppercase tracking-tight">${m.n}</p>
+                        <p class="text-[8px] text-slate-500 font-bold uppercase tracking-widest mt-1">${m.i}</p>
                     </div>
                     <div class="grid grid-cols-4 gap-1">
                         ${['PRESENTE','AUSENTE','RETARDO','EXCUSA'].map(s => `
-                            <button onclick="mark('${m.n}','${s}', this)" class="btn-status p-2 py-3 rounded-xl border transition-all 
-                            ${sel === s ? getCol(s) : 'bg-white/50 border-white/20'}">${s}</button>
+                            <button onclick="mark('${m.n}','${s}', this)" class="btn-status p-2 py-3 rounded-xl transition-all 
+                            ${sel === s ? getCol(s) : 'bg-white/60 border-slate-200'}">${s}</button>
                         `).join('')}
                     </div>`;
                 box.appendChild(card);
@@ -242,7 +258,7 @@
         }
 
         function getFamClass(f) {
-            const fam = f.toUpperCase();
+            const fam = normalizeText(f);
             if(fam.includes("MADERA")) return "bg-maderas";
             if(fam.includes("BRONCE")) return "bg-bronces";
             if(fam.includes("CUERDA")) return "bg-cuerdas";
@@ -252,19 +268,22 @@
 
         function getCol(s) {
             const cols = { PRESENTE: 'bg-green-600 border-green-600', AUSENTE: 'bg-red-600 border-red-600', RETARDO: 'bg-orange-500 border-orange-500', EXCUSA: 'bg-blue-600 border-blue-600' };
-            return `${cols[s]} text-white shadow-md font-black`;
+            return `${cols[s]} text-white shadow-md font-black border-transparent`;
         }
 
         function mark(nom, est, btn) {
             record[nom] = est;
             document.getElementById('counter').innerText = `${Object.keys(record).length} REGISTROS`;
-            btn.parentElement.querySelectorAll('button').forEach(b => b.className = "btn-status p-2 py-3 rounded-xl border transition-all bg-white/50 border-white/20");
-            btn.className = `btn-status p-2 py-3 rounded-xl border transition-all ${getCol(est)}`;
+            btn.parentElement.querySelectorAll('button').forEach(b => b.className = "btn-status p-2 py-3 rounded-xl transition-all bg-white/60 border-slate-200");
+            btn.className = `btn-status p-2 py-3 rounded-xl transition-all ${getCol(est)}`;
         }
 
         function filterList() {
-            const q = document.getElementById('search').value.toLowerCase();
-            document.querySelectorAll('.card-musico').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? 'block' : 'none');
+            const q = normalizeText(document.getElementById('search').value);
+            document.querySelectorAll('.card-musico').forEach(c => {
+                const text = normalizeText(c.innerText);
+                c.style.display = text.includes(q) ? 'block' : 'none';
+            });
         }
 
         function confirmFinalize() {
