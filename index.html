@@ -7,33 +7,23 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Montserrat', sans-serif; background-color: #F8FAFC; color: #1E293B; }
+        body { font-family: 'Montserrat', sans-serif; background-color: #F8FAFC; color: #1E293B; overflow-x: hidden; }
         .hidden { display: none; }
         .loader { border-top-color: #1E3A8A; animation: spinner 1.5s linear infinite; }
         @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .active-tab { border-bottom: 3px solid #1E3A8A; color: #1E3A8A; font-weight: 800; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* Afinador Visuals */
-        .tuner-gauge { position: relative; height: 120px; background: linear-gradient(90deg, #fee2e2 0%, #fef9c3 50%, #fee2e2 100%); border-radius: 20px; overflow: hidden; border: 1px solid #e2e8f0; }
-        .tuner-needle { position: absolute; bottom: 0; left: 50%; width: 4px; height: 100%; background: #1e293b; transform-origin: bottom center; transition: transform 0.1s ease-out, background 0.3s; }
-        .center-line { position: absolute; left: 50%; top: 0; width: 2px; height: 100%; background: #16a34a; opacity: 0.3; transform: translateX(-50%); }
-
-        .bg-maderas { background-color: #F0FDF4; border-left: 6px solid #4ADE80; }
-        .bg-bronces { background-color: #FFFBEB; border-left: 6px solid #FBBF24; }
-        .bg-cuerdas { background-color: #EFF6FF; border-left: 6px solid #60A5FA; }
-        .bg-percusion { background-color: #F8FAFC; border-left: 6px solid #94A3B8; }
-
-        .btn-status { font-size: 10px; font-weight: 800; color: #334155; border: 1px solid #E2E8F0; }
-        .header-nav { display: flex; justify-content: flex-start; padding-bottom: 1.5rem; width: 100%; }
-        .btn-atras { font-size: 11px; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.1em; }
+        /* AFINADOR */
+        #tuner-needle { transition: transform 0.1s ease-out, color 0.2s; transform-origin: bottom center; }
+        .tuner-bg { background: linear-gradient(90deg, #fee2e2 0%, #fef9c3 50%, #fee2e2 100%); }
     </style>
 </head>
 <body>
 
     <div id="loader" class="hidden fixed inset-0 bg-slate-50/90 z-50 flex flex-col items-center justify-center">
         <div class="loader ease-linear rounded-full border-4 border-t-4 border-slate-200 h-14 w-14 mb-4"></div>
-        <p class="text-blue-900 font-bold tracking-widest text-[10px]">PROCESANDO...</p>
+        <p id="loader-text" class="text-blue-900 font-bold tracking-widest text-[10px]">PROCESANDO...</p>
     </div>
 
     <div id="screen-login" class="flex items-center justify-center min-h-screen p-6">
@@ -55,146 +45,210 @@
 
     <div id="screen-menu" class="hidden p-6 max-w-md mx-auto flex flex-col min-h-screen">
         <div class="flex justify-between items-start mb-10 mt-4">
-            <h2 class="text-xl font-extrabold text-slate-800 uppercase tracking-tight leading-tight">BANDA SINFÓNICA<br><span id="display-band-name" class="text-blue-900"></span></h2>
+            <h2 class="text-xl font-extrabold text-slate-800 uppercase tracking-tight leading-tight">
+                BANDA SINFÓNICA<br><span id="display-band-name" class="text-blue-900"></span>
+            </h2>
             <button onclick="logout()" class="text-red-600 text-[11px] font-black uppercase border-2 border-red-100 px-5 py-2 rounded-xl bg-red-50">SALIR</button>
         </div>
         
         <div class="space-y-4">
-            <button onclick="nav('screen-activity')" class="w-full bg-white p-6 rounded-[30px] shadow-sm border border-slate-100 flex justify-between items-center">
-                <div class="text-left"><p class="font-black text-slate-900 text-sm uppercase">ASISTENCIA</p></div>
-                <div class="bg-blue-50 p-3 rounded-xl text-xl">📋</div>
+            <button onclick="nav('screen-activity')" class="w-full bg-white p-8 rounded-[35px] shadow-sm border border-slate-100 flex justify-between items-center">
+                <div class="text-left">
+                    <p class="font-black text-slate-900 text-lg uppercase">ASISTENCIA</p>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">NUEVO REGISTRO</p>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-2xl text-2xl">📋</div>
             </button>
 
-            <button onclick="openTuner()" class="w-full bg-white p-6 rounded-[30px] shadow-sm border border-slate-100 flex justify-between items-center">
-                <div class="text-left"><p class="font-black text-slate-900 text-sm uppercase">AFINADOR</p></div>
-                <div class="bg-slate-50 p-3 rounded-xl text-xl">🎵</div>
+            <button onclick="startTuner()" class="w-full bg-white p-8 rounded-[35px] shadow-sm border border-slate-100 flex justify-between items-center">
+                <div class="text-left">
+                    <p class="font-black text-slate-900 text-lg uppercase">AFINADOR</p>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">HERRAMIENTA</p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-2xl text-2xl">🎼</div>
             </button>
         </div>
 
         <div class="mt-auto flex justify-center opacity-90 pb-10">
-            <img src="https://github.com/paisatuba1/Asistencia-Banda/blob/main/logo.png?raw=true" alt="Logo" class="max-w-[150px]">
+            <img src="https://github.com/paisatuba1/Asistencia-Banda/blob/main/logo.png?raw=true" alt="Logo" class="max-w-[180px]">
         </div>
     </div>
 
-    <div id="screen-tuner" class="hidden p-6 max-w-md mx-auto">
-        <div class="header-nav">
-            <button onclick="closeTuner()" class="btn-atras">← ATRÁS</button>
-        </div>
-        <div class="bg-white p-8 rounded-[40px] shadow-sm border border-slate-100 text-center space-y-8">
-            <h2 class="text-xs font-black text-slate-400 uppercase tracking-widest">AFINADOR DIGITAL</h2>
-            
-            <div id="note-display" class="text-7xl font-black text-slate-800 transition-all h-20">--</div>
-            <div id="cents-display" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">TOQUE UNA NOTA</div>
-
-            <div class="tuner-gauge">
-                <div class="center-line"></div>
-                <div id="needle" class="tuner-needle"></div>
+    <div id="screen-tuner" class="hidden p-6 max-w-md mx-auto flex flex-col min-h-screen">
+        <button onclick="stopTuner()" class="text-[11px] font-black text-slate-400 mb-8 uppercase tracking-widest text-left">← VOLVER AL MENÚ</button>
+        
+        <div class="bg-white rounded-[40px] p-8 shadow-sm border border-slate-100 flex-1 flex flex-col items-center justify-between">
+            <div class="text-center w-full">
+                <div class="flex justify-center gap-4 mb-6">
+                    <select id="tuner-calib" class="bg-slate-50 border-none rounded-xl p-2 font-black text-[10px] text-blue-900">
+                        <option value="440">440 Hz</option>
+                        <option value="441">441 Hz</option>
+                        <option value="442" selected>442 Hz</option>
+                        <option value="443">443 Hz</option>
+                        <option value="444">444 Hz</option>
+                        <option value="445">445 Hz</option>
+                    </select>
+                </div>
+                
+                <div id="note-display" class="text-7xl font-black text-slate-800 mb-2">--</div>
+                <div id="freq-display" class="text-[10px] font-bold text-slate-300 tracking-widest">0.00 HZ</div>
             </div>
 
-            <div class="flex justify-center items-center gap-4">
-                <label class="text-[9px] font-black text-slate-400 uppercase">CALIBRACIÓN</label>
-                <select id="calib" class="bg-slate-100 p-2 rounded-lg font-bold text-xs outline-none">
-                    <option value="440">440 HZ</option>
-                    <option value="441">441 HZ</option>
-                    <option value="442" selected>442 HZ</option>
-                    <option value="443">443 HZ</option>
-                    <option value="444">444 HZ</option>
-                    <option value="445">445 HZ</option>
+            <div class="relative w-full h-32 flex items-end justify-center overflow-hidden rounded-2xl tuner-bg mb-10">
+                <div id="tuner-needle" class="w-1 h-24 bg-slate-800 rounded-full" style="transform: rotate(0deg);"></div>
+                <div class="absolute bottom-0 w-full h-1 bg-slate-200"></div>
+                <div class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[8px] font-bold text-slate-400">CENT</div>
+            </div>
+
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center">ASEGÚRESE DE ESTAR EN UN LUGAR SILENCIOSO</p>
+        </div>
+    </div>
+
+    <div id="screen-activity" class="hidden p-6 max-w-md mx-auto flex flex-col items-start">
+        <button onclick="nav('screen-menu')" class="text-[11px] font-black text-slate-400 mb-6 uppercase tracking-widest">← ATRÁS</button>
+        <div class="w-full space-y-8 bg-white p-8 rounded-[40px] shadow-sm border border-slate-100">
+            <h2 class="text-xl font-extrabold text-slate-800 uppercase">EVENTO</h2>
+            <div>
+                <label class="block text-[9px] font-black text-slate-400 mb-2 uppercase tracking-widest">FECHA</label>
+                <input type="date" id="event-date" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border-none outline-none text-sm">
+            </div>
+            <div>
+                <label class="block text-[9px] font-black text-slate-400 mb-2 uppercase tracking-widest">CATEGORÍA</label>
+                <select id="event-type" onchange="toggleEventDesc()" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border-none outline-none text-sm">
+                    <option value="Ensayo">ENSAYO REGULAR</option>
+                    <option value="Evento">EVENTO ESPECIAL</option>
                 </select>
             </div>
-            <button id="start-tuner" onclick="initAudio()" class="w-full bg-blue-900 text-white p-4 rounded-2xl font-black uppercase text-[10px] tracking-widest">ACTIVAR MICRÓFONO</button>
+            <div id="event-desc-box" class="hidden">
+                <label class="block text-[9px] font-black text-orange-500 mb-2 uppercase tracking-widest">NOMBRE DEL EVENTO</label>
+                <input type="text" id="event-desc" class="w-full p-4 bg-orange-50 rounded-2xl font-bold outline-none text-sm uppercase">
+            </div>
+            <button onclick="nav('screen-process')" class="w-full bg-blue-900 text-white p-5 rounded-2xl font-black uppercase text-[10px]">CONTINUAR</button>
         </div>
     </div>
-
+    
     <script>
-        // ... (Variables de sesión y login se mantienen igual) ...
-        const notes = ["C", "C# / Db", "D", "D# / Eb", "E", "F", "F# / Gb", "G", "G# / Ab", "A", "A# / Bb", "B"];
-        let audioCtx, analyser, dataArray, source, animationId;
-
-        async function initAudio() {
-            try {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 2048;
-                source = audioCtx.createMediaStreamSource(stream);
-                source.connect(analyser);
-                dataArray = new Float32Array(analyser.frequencyBinCount);
-                document.getElementById('start-tuner').classList.add('hidden');
-                updateTuner();
-            } catch (e) { alert("ERROR AL ACCEDER AL MICRÓFONO"); }
-        }
-
-        function updateTuner() {
-            analyser.getFloat32Array(dataArray);
-            let pitch = autoCorrelate(dataArray, audioCtx.sampleRate);
+        const MOTOR_URL = "https://script.google.com/macros/s/AKfycbxtkm0dnVBahNtdua02_0iK04_aYH8AzKFqwgm4r8NqeCeTjHpgSPZSB2wBK-LN86UK/exec";
+        let session = { user: "", banda: "", sheetId: "" };
+        
+        // --- LOGICA DE LOGIN ---
+        async function loginProcess() {
+            const u = document.getElementById('user-input').value.trim();
+            const p = document.getElementById('pass-input').value.trim();
+            if(!u || !p) return;
             
-            if (pitch !== -1) {
-                let calib = parseInt(document.getElementById('calib').value);
-                let noteNum = 12 * (Math.log(pitch / calib) / Math.log(2));
-                let roundedNote = Math.round(noteNum) + 69;
-                let diff = noteNum - Math.round(noteNum);
+            setLoader(true, "VALIDANDO DATOS...");
+            try {
+                const resp = await fetch(`${MOTOR_URL}?action=login&user=${encodeURIComponent(u)}&pass=${encodeURIComponent(p)}`);
+                const data = await resp.json();
                 
-                document.getElementById('note-display').innerText = notes[roundedNote % 12];
-                let cents = Math.floor(diff * 100);
-                document.getElementById('cents-display').innerText = cents > 0 ? `+${cents} CENTS` : `${cents} CENTS`;
-                
-                // Mover aguja (-45deg a 45deg)
-                let angle = diff * 90;
-                let needle = document.getElementById('needle');
-                needle.style.transform = `translateX(-50%) rotate(${angle}deg)`;
-                
-                // Color por afinación
-                if (Math.abs(cents) < 5) {
-                    needle.style.background = "#16a34a"; // Verde
-                    document.getElementById('note-display').style.color = "#16a34a";
-                } else if (Math.abs(cents) < 15) {
-                    needle.style.background = "#eab308"; // Amarillo
-                    document.getElementById('note-display').style.color = "#1e293b";
+                if(data.success) {
+                    setLoader(true, "¡ACCESO CONCEDIDO!"); // Confirmación visual
+                    setTimeout(() => {
+                        session = { user: u, banda: data.data.banda, sheetId: data.data.sheetId };
+                        localStorage.setItem('atril_digital_v5', JSON.stringify(session));
+                        updateUIBandName();
+                        nav('screen-menu');
+                        setLoader(false);
+                    }, 1000);
                 } else {
-                    needle.style.background = "#ef4444"; // Rojo
-                    document.getElementById('note-display').style.color = "#1e293b";
+                    setLoader(false);
+                    document.getElementById('login-error').classList.remove('hidden');
                 }
-            }
-            animationId = requestAnimationFrame(updateTuner);
+            } catch (e) { setLoader(false); alert("ERROR DE RED"); }
         }
 
-        // Algoritmo de detección de frecuencia (Auto-correlación)
-        function autoCorrelate(buf, sampleRate) {
-            let SIZE = buf.length;
-            let rms = 0;
-            for (let i=0; i<SIZE; i++) rms += buf[i]*buf[i];
-            rms = Math.sqrt(rms/SIZE);
-            if (rms<0.01) return -1;
-
-            let r1=0, r2=SIZE-1, thres=0.2;
-            for (let i=0; i<SIZE/2; i++) if (Math.abs(buf[i])<thres) { r1=i; break; }
-            for (let i=1; i<SIZE/2; i++) if (Math.abs(buf[SIZE-i])<thres) { r2=SIZE-i; break; }
-            buf = buf.slice(r1,r2);
-            SIZE = buf.length;
-
-            let c = new Float32Array(SIZE);
-            for (let i=0; i<SIZE; i++) for (let j=0; j<SIZE-i; j++) c[i] = c[i] + buf[j]*buf[j+i];
-            let d=0; while (c[d]>c[d+1]) d++;
-            let maxval=-1, maxpos=-1;
-            for (let i=d; i<SIZE; i++) if (c[i]>maxval) { maxval=c[i]; maxpos=i; }
-            let T0 = maxpos;
-            return sampleRate/T0;
+        function setLoader(v, text = "PROCESANDO...") {
+            document.getElementById('loader-text').innerText = text;
+            document.getElementById('loader').classList.toggle('hidden', !v);
         }
 
-        function openTuner() { nav('screen-tuner'); }
-        function closeTuner() { 
-            cancelAnimationFrame(animationId); 
-            if(audioCtx) audioCtx.close();
-            document.getElementById('start-tuner').classList.remove('hidden');
-            nav('screen-menu'); 
-        }
-
-        // ... (Se mantienen el resto de funciones nav, loginProcess, etc.) ...
         function nav(id) {
             document.querySelectorAll('body > div').forEach(d => d.id !== 'loader' && d.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         }
+
+        function logout() { localStorage.removeItem('atril_digital_v5'); location.reload(); }
+        function updateUIBandName() { 
+            let name = session.banda.toUpperCase().replace("BANDA SINFONICA", "").trim();
+            document.getElementById('display-band-name').innerText = name; 
+        }
+
+        // --- LÓGICA DEL AFINADOR ---
+        let audioCtx, analyser, stream;
+        const notes = ["C", "C# / Db", "D", "D# / Eb", "E", "F", "F# / Gb", "G", "G# / Ab", "A", "A# / Bb", "B"];
+
+        async function startTuner() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+                audioCtx.createMediaStreamSource(stream).connect(analyser);
+                nav('screen-tuner');
+                updateTuner();
+            } catch (e) { alert("SE REQUIERE PERMISO DE MICRÓFONO"); }
+        }
+
+        function stopTuner() {
+            if(stream) stream.getTracks().forEach(t => t.stop());
+            if(audioCtx) audioCtx.close();
+            nav('screen-menu');
+        }
+
+        function updateTuner() {
+            if(document.getElementById('screen-tuner').classList.contains('hidden')) return;
+            
+            const buffer = new Float32Array(analyser.fftSize);
+            analyser.getFloatTimeDomainData(buffer);
+            const freq = autoCorrelate(buffer, audioCtx.sampleRate);
+            
+            if (freq !== -1) {
+                const calib = parseInt(document.getElementById('tuner-calib').value);
+                const midi = 12 * Math.log2(freq / calib) + 69;
+                const noteIndex = Math.round(midi) % 12;
+                const cents = Math.floor((midi - Math.round(midi)) * 100);
+                
+                document.getElementById('note-display').innerText = notes[noteIndex];
+                document.getElementById('freq-display').innerText = freq.toFixed(2) + " HZ";
+                
+                // Movimiento aguja
+                const needle = document.getElementById('tuner-needle');
+                needle.style.transform = `rotate(${cents * 0.9}deg)`;
+                
+                // Color si está afinado
+                if (Math.abs(cents) < 5) {
+                    needle.style.backgroundColor = "#22c55e"; // Verde
+                } else {
+                    needle.style.backgroundColor = "#1e293b"; // Gris oscuro
+                }
+            }
+            requestAnimationFrame(updateTuner);
+        }
+
+        function autoCorrelate(buf, sampleRate) {
+            let SIZE = buf.length;
+            let rms = 0;
+            for (let i=0; i<SIZE; i++) rms += buf[i]*buf[i];
+            if (Math.sqrt(rms/SIZE) < 0.01) return -1;
+            
+            let r1 = 0, r2 = SIZE-1, thres = 0.2;
+            for (let i=0; i<SIZE/2; i++) if (Math.abs(buf[i]) < thres) { r1 = i; break; }
+            for (let i=1; i<SIZE/2; i++) if (Math.abs(buf[SIZE-i]) < thres) { r2 = SIZE-i; break; }
+            buf = buf.slice(r1, r2);
+            SIZE = buf.length;
+
+            let c = new Array(SIZE).fill(0);
+            for (let i=0; i<SIZE; i++) for (let j=0; j<SIZE-i; j++) c[i] = c[i] + buf[j]*buf[j+i];
+            let d = 0; while (c[d] > c[d+1]) d++;
+            let maxval = -1, maxpos = -1;
+            for (let i=d; i<SIZE; i++) if (c[i] > maxval) { maxval = c[i]; maxpos = i; }
+            return sampleRate/maxpos;
+        }
+
+        window.onload = () => {
+            const saved = localStorage.getItem('atril_digital_v5');
+            if (saved) { session = JSON.parse(saved); updateUIBandName(); nav('screen-menu'); }
+        };
     </script>
 </body>
 </html>
