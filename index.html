@@ -11,46 +11,32 @@
         .hidden { display: none; }
         .loader { border-top-color: #1E3A8A; animation: spinner 1.5s linear infinite; }
         @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Efecto de pulso para carga en login */
+        .pulse-loading { animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+
         .active-tab { border-bottom: 3px solid #1E3A8A; color: #1E3A8A; font-weight: 800; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* Colores de Familia */
+        /* Colores por familia */
         .bg-maderas { background-color: #F0FDF4; border-left: 6px solid #4ADE80; }
         .bg-bronces { background-color: #FFFBEB; border-left: 6px solid #FBBF24; }
         .bg-cuerdas { background-color: #EFF6FF; border-left: 6px solid #60A5FA; }
         .bg-percusion { background-color: #F8FAFC; border-left: 6px solid #94A3B8; }
 
         .btn-status { font-size: 10px; font-weight: 800; color: #334155; border: 1px solid #E2E8F0; }
+        .card-musico { transition: transform 0.2s ease; }
+        
         .header-nav { display: flex; justify-content: flex-start; padding-bottom: 1.5rem; width: 100%; }
         .btn-atras { font-size: 11px; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.1em; }
-
-        /* Estilos Afinador */
-        .tuner-arc {
-            width: 280px; height: 140px;
-            border-radius: 150px 150px 0 0;
-            position: relative; overflow: hidden;
-            background: linear-gradient(to right, #EF4444 0%, #EF4444 35%, #F59E0B 35%, #F59E0B 45%, #10B981 45%, #10B981 55%, #F59E0B 55%, #F59E0B 65%, #EF4444 65%, #EF4444 100%);
-        }
-        .needle {
-            position: absolute; bottom: 0; left: 50%;
-            width: 4px; height: 120px;
-            background: #1E293B; border-radius: 4px;
-            transform-origin: bottom center;
-            transform: rotate(-90deg); transition: transform 0.1s ease-out;
-            z-index: 10;
-        }
-        .center-dot {
-            position: absolute; bottom: -10px; left: 50%;
-            width: 20px; height: 20px; background: #1E293B;
-            border-radius: 50%; transform: translateX(-50%); z-index: 20;
-        }
     </style>
 </head>
 <body>
 
     <div id="loader" class="hidden fixed inset-0 bg-slate-50/90 z-50 flex flex-col items-center justify-center">
         <div class="loader ease-linear rounded-full border-4 border-t-4 border-slate-200 h-14 w-14 mb-4"></div>
-        <p class="text-blue-900 font-bold tracking-widest text-[10px]">PROCESANDO...</p>
+        <p class="text-blue-900 font-bold tracking-widest text-[10px] uppercase">PROCESANDO DATOS...</p>
     </div>
 
     <div id="screen-login" class="flex items-center justify-center min-h-screen p-6">
@@ -58,13 +44,19 @@
             <img src="https://github.com/paisatuba1/Asistencia-Banda/blob/main/logo.png?raw=true" alt="Logo" class="w-20 mx-auto mb-6">
             <h1 class="text-2xl font-black text-slate-800 mb-1 uppercase tracking-tight">ATRIL DIGITAL</h1>
             <p class="text-slate-400 text-[9px] mb-10 uppercase tracking-[0.3em] font-bold">GESTIÓN PROFESIONAL</p>
-            <div class="space-y-4">
+            
+            <div id="login-form" class="space-y-4">
                 <input type="text" id="user-input" placeholder="USUARIO" class="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-blue-500 font-bold text-sm text-center uppercase tracking-widest">
                 <input type="password" id="pass-input" placeholder="CONTRASEÑA" class="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-blue-500 text-center text-2xl tracking-widest font-bold">
-                <button onclick="loginProcess()" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-extrabold shadow-lg transition-all text-xs tracking-widest uppercase mt-4">INGRESAR</button>
+                <button id="btn-login-action" onclick="loginProcess()" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-extrabold shadow-lg transition-all text-xs tracking-widest uppercase mt-4">INGRESAR</button>
             </div>
+
             <p id="login-error" class="text-red-500 text-[10px] mt-6 hidden font-bold uppercase">DATOS INCORRECTOS</p>
-            <div id="inactive-error" class="hidden mt-6 p-4 bg-orange-50 rounded-2xl border border-orange-100 text-orange-600 font-bold text-[10px] uppercase">USUARIO INACTIVO</div>
+            
+            <div id="inactive-error" class="hidden mt-6 p-4 bg-orange-50 rounded-2xl border border-orange-100">
+                <p class="text-orange-600 text-[10px] font-black uppercase leading-tight">USUARIO INACTIVO</p>
+                <p class="text-orange-400 text-[8px] font-bold uppercase mt-1">CONTACTE AL ADMINISTRADOR PARA ACTIVAR SU CUENTA</p>
+            </div>
         </div>
     </div>
 
@@ -76,89 +68,294 @@
             <button onclick="logout()" class="text-red-600 text-[11px] font-black uppercase border-2 border-red-100 px-5 py-2 rounded-xl bg-red-50">SALIR</button>
         </div>
         
-        <div class="grid grid-cols-1 gap-4">
-            <button onclick="nav('screen-activity')" class="w-full bg-white p-6 rounded-[30px] shadow-sm border border-slate-100 flex justify-between items-center">
-                <div class="text-left"><p class="font-black text-slate-900 text-sm uppercase">ASISTENCIA</p></div>
-                <div class="bg-blue-50 p-3 rounded-xl">📋</div>
-            </button>
-            <button class="w-full bg-white p-6 rounded-[30px] shadow-sm border border-slate-100 flex justify-between items-center opacity-50">
-                <div class="text-left"><p class="font-black text-slate-900 text-sm uppercase">DIRECTORIO</p></div>
-                <div class="bg-emerald-50 p-3 rounded-xl">📞</div>
-            </button>
-            <button class="w-full bg-white p-6 rounded-[30px] shadow-sm border border-slate-100 flex justify-between items-center opacity-50">
-                <div class="text-left"><p class="font-black text-slate-900 text-sm uppercase">METRÓNOMO</p></div>
-                <div class="bg-orange-50 p-3 rounded-xl">⏱️</div>
-            </button>
-            <button onclick="nav('screen-tuner')" class="w-full bg-white p-6 rounded-[30px] shadow-sm border border-slate-100 flex justify-between items-center">
-                <div class="text-left"><p class="font-black text-slate-900 text-sm uppercase">AFINADOR</p></div>
-                <div class="bg-indigo-50 p-3 rounded-xl">🎸</div>
-            </button>
-        </div>
+        <button onclick="nav('screen-activity')" class="w-full bg-white p-8 rounded-[35px] shadow-sm border border-slate-100 flex justify-between items-center mb-10">
+            <div class="text-left">
+                <p class="font-black text-slate-900 text-lg uppercase">ASISTENCIA</p>
+                <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">NUEVO REGISTRO</p>
+            </div>
+            <div class="bg-blue-50 p-4 rounded-2xl text-2xl">📋</div>
+        </button>
 
         <div class="mt-auto flex justify-center opacity-90 pb-10">
-            <img src="https://github.com/paisatuba1/Asistencia-Banda/blob/main/logo.png?raw=true" alt="Logo" class="max-w-[150px]">
-        </div>
-    </div>
-
-    <div id="screen-tuner" class="hidden p-6 max-w-md mx-auto flex flex-col items-center min-h-screen">
-        <div class="header-nav">
-            <button onclick="nav('screen-menu')" class="btn-atras">← ATRÁS</button>
-        </div>
-        
-        <div class="bg-white w-full p-10 rounded-[40px] shadow-sm border border-slate-100 flex flex-col items-center mt-10">
-            <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-12">TUNER PRO</h2>
-            
-            <div class="tuner-arc">
-                <div class="needle" id="tuner-needle"></div>
-                <div class="center-dot"></div>
-            </div>
-
-            <div class="text-center mt-12">
-                <p id="note-display" class="text-6xl font-black text-slate-900">A</p>
-                <p id="cents-display" class="text-[10px] font-bold text-slate-400 mt-2 uppercase">0 CENTS</p>
-            </div>
-
-            <button class="mt-12 bg-slate-900 text-white px-10 py-4 rounded-2xl font-black text-[10px] tracking-widest uppercase shadow-lg">INICIAR MICRÓFONO</button>
+            <img src="https://github.com/paisatuba1/Asistencia-Banda/blob/main/logo.png?raw=true" alt="Logo" class="max-w-[180px]">
         </div>
     </div>
 
     <div id="screen-activity" class="hidden p-6 max-w-md mx-auto flex flex-col items-start">
         <div class="header-nav"><button onclick="nav('screen-menu')" class="btn-atras">← ATRÁS</button></div>
         <div class="w-full space-y-8 bg-white p-8 rounded-[40px] shadow-sm border border-slate-100">
-            <h2 class="text-xl font-extrabold text-slate-800 uppercase">EVENTO</h2>
+            <h2 class="text-xl font-extrabold text-slate-800 uppercase tracking-tight">EVENTO</h2>
             <div>
                 <label class="block text-[9px] font-black text-slate-400 mb-2 uppercase tracking-widest">FECHA</label>
                 <input type="date" id="event-date" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border-none outline-none text-sm">
             </div>
-            <select id="event-type" onchange="toggleEventDesc()" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border-none outline-none text-sm">
-                <option value="Ensayo">ENSAYO REGULAR</option>
-                <option value="Evento">EVENTO ESPECIAL</option>
-            </select>
-            <div id="event-desc-box" class="hidden">
-                <input type="text" id="event-desc" placeholder="NOMBRE DEL EVENTO" class="w-full p-4 bg-orange-50 rounded-2xl font-bold outline-none text-sm uppercase">
+            <div>
+                <label class="block text-[9px] font-black text-slate-400 mb-2 uppercase tracking-widest">CATEGORÍA</label>
+                <select id="event-type" onchange="toggleEventDesc()" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border-none outline-none text-sm">
+                    <option value="Ensayo">ENSAYO REGULAR</option>
+                    <option value="Evento">EVENTO ESPECIAL</option>
+                </select>
             </div>
-            <button onclick="nav('screen-process')" class="w-full bg-blue-900 text-white p-5 rounded-2xl font-black uppercase tracking-widest text-[10px]">CONTINUAR</button>
+            <div id="event-desc-box" class="hidden">
+                <label class="block text-[9px] font-black text-orange-500 mb-2 uppercase tracking-widest">NOMBRE DEL EVENTO</label>
+                <input type="text" id="event-desc" placeholder="EJ: CONCIERTO DE GALA" class="w-full p-4 bg-orange-50 rounded-2xl font-bold outline-none text-sm uppercase">
+            </div>
+            <button onclick="nav('screen-process')" class="w-full bg-blue-900 text-white p-5 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-md">CONTINUAR</button>
+        </div>
+    </div>
+
+    <div id="screen-process" class="hidden p-6 max-w-md mx-auto flex flex-col items-start">
+        <div class="header-nav"><button onclick="nav('screen-activity')" class="btn-atras">← ATRÁS</button></div>
+        <div class="w-full text-center space-y-4">
+            <h2 class="text-lg font-extrabold mb-8 text-slate-800 uppercase tracking-widest">SELECCIONE PROCESO</h2>
+            <button onclick="initAttendance('PREBANDA')" class="w-full p-6 bg-white rounded-3xl shadow-sm font-extrabold text-left border-l-8 border-green-400 uppercase text-xs">PREBANDA</button>
+            <button onclick="initAttendance('BANDA INFANTIL')" class="w-full p-6 bg-white rounded-3xl shadow-sm font-extrabold text-left border-l-8 border-blue-400 uppercase text-xs">BANDA INFANTIL</button>
+            <button onclick="initAttendance('BANDA TITULAR')" class="w-full p-6 bg-white rounded-3xl shadow-sm font-extrabold text-left border-l-8 border-slate-700 uppercase text-xs">BANDA TITULAR</button>
+        </div>
+    </div>
+
+    <div id="screen-list" class="hidden min-h-screen pb-44">
+        <div class="bg-white/90 backdrop-blur-md p-5 sticky top-0 z-20 border-b border-slate-100">
+            <div class="header-nav !pb-2"><button onclick="nav('screen-process')" class="btn-atras">← ATRÁS</button></div>
+            <div class="flex justify-between items-center mb-4">
+                <p id="info-header" class="font-extrabold text-[10px] text-slate-400 uppercase tracking-tighter"></p>
+                <span id="counter" class="text-[9px] bg-slate-800 text-white px-3 py-1 rounded-full font-bold uppercase">0 REGISTROS</span>
+            </div>
+            <input type="text" id="search" onkeyup="filterList()" placeholder="BUSCAR POR NOMBRE O INSTRUMENTO..." class="w-full p-4 bg-slate-100 rounded-2xl outline-none font-bold text-[11px] mb-4">
+            
+            <div class="flex gap-5 overflow-x-auto no-scrollbar text-[9px] font-black uppercase border-t border-slate-50 pt-3">
+                <button onclick="renderSection('TODOS')" class="tab-btn active-tab pb-2">TODOS</button>
+                <button onclick="renderSection('MADERAS')" class="tab-btn text-slate-300 pb-2">MADERAS</button>
+                <button onclick="renderSection('BRONCES')" class="tab-btn text-slate-300 pb-2">BRONCES</button>
+                <button onclick="renderSection('CUERDAS')" class="tab-btn text-slate-300 pb-2">CUERDAS</button>
+                <button onclick="renderSection('PERCUSIÓN')" class="tab-btn text-slate-300 pb-2 uppercase">PERCUSIÓN</button>
+            </div>
+        </div>
+
+        <div id="musicos-box" class="p-5 space-y-4"></div>
+
+        <div class="fixed bottom-0 bg-white/95 backdrop-blur-sm w-full p-6 border-t border-slate-100 shadow-2xl flex gap-3">
+            <button onclick="confirmFinalize()" class="flex-[2] bg-blue-900 text-white p-5 rounded-2xl font-black uppercase tracking-widest text-[10px]">GUARDAR DRIVE</button>
+            <button onclick="whatsappReport()" class="flex-1 bg-emerald-500 text-white p-5 rounded-2xl font-black text-center text-[10px] tracking-widest">WHATSAPP</button>
         </div>
     </div>
 
     <script>
-        // Lógica de navegación y fecha
-        function nav(id) {
-            document.querySelectorAll('body > div').forEach(d => d.id !== 'loader' && d.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
+        const MOTOR_URL = "https://script.google.com/macros/s/AKfycbxtkm0dnVBahNtdua02_0iK04_aYH8AzKFqwgm4r8NqeCeTjHpgSPZSB2wBK-LN86UK/exec";
+        
+        const INSTRUMENT_ORDER = [
+            "FLAUTA", "OBOE", "FAGOT", "CLARINETE", "CLARIBAJO", "SAX ALTO", "SAX TENOR", "SAX BARÍTONO",
+            "TROMPETA", "CORNO", "TROMBÓN", "EUFONIO", "TUBA", "CELLO", "CONTRABAJO", "PERCUSIÓN"
+        ];
+
+        let session = { user: "", banda: "", sheetId: "", date: "", type: "", act: "", process: "", masterList: [] };
+        let record = {};
+        let currentFamily = "TODOS";
+
+        // --- INICIO Y PERSISTENCIA ---
+        window.onload = () => {
+            const saved = localStorage.getItem('atril_digital_v5');
+            if (saved) {
+                session = JSON.parse(saved);
+                updateUIBandName();
+                nav('screen-menu');
+                fetchIntegrantes();
+            }
+        };
+
+        function updateUIBandName() {
+            let name = session.banda.toUpperCase().replace("BANDA SINFONICA", "").replace("BANDA", "").trim();
+            document.getElementById('display-band-name').innerText = name;
+        }
+
+        // --- PROCESO DE LOGIN ---
+        async function loginProcess() {
+            const u = document.getElementById('user-input').value.trim();
+            const p = document.getElementById('pass-input').value.trim();
+            if(!u || !p) return;
             
-            if(id === 'screen-activity') {
-                const today = new Date().toISOString().split('T')[0];
-                document.getElementById('event-date').value = today;
+            // Efecto visual de carga
+            const btn = document.getElementById('btn-login-action');
+            btn.innerText = "VERIFICANDO...";
+            btn.classList.add('pulse-loading');
+            document.getElementById('login-error').classList.add('hidden');
+            document.getElementById('inactive-error').classList.add('hidden');
+
+            try {
+                const resp = await fetch(`${MOTOR_URL}?action=login&user=${encodeURIComponent(u)}&pass=${encodeURIComponent(p)}`);
+                const data = await resp.json();
+                
+                if(data.success) {
+                    if(data.data.estatus && data.data.estatus.toUpperCase() !== 'ACTIVO') {
+                        document.getElementById('inactive-error').classList.remove('hidden');
+                        resetLoginBtn();
+                    } else {
+                        session.user = u;
+                        session.banda = data.data.banda;
+                        session.sheetId = data.data.sheetId;
+                        localStorage.setItem('atril_digital_v5', JSON.stringify(session));
+                        updateUIBandName();
+                        nav('screen-menu');
+                        await fetchIntegrantes();
+                    }
+                } else { 
+                    document.getElementById('login-error').classList.remove('hidden'); 
+                    resetLoginBtn();
+                }
+            } catch (e) { 
+                alert("ERROR DE CONEXIÓN"); 
+                resetLoginBtn();
             }
         }
 
-        // Simulación de movimiento de aguja para prueba visual
-        function testNeedle(deg) {
-            document.getElementById('tuner-needle').style.transform = `rotate(${deg}deg)`;
+        function resetLoginBtn() {
+            const btn = document.getElementById('btn-login-action');
+            btn.innerText = "INGRESAR";
+            btn.classList.remove('pulse-loading');
         }
 
-        // El resto de funciones de login y asistencia se mantienen intactas del código anterior
+        function logout() { localStorage.removeItem('atril_digital_v5'); location.reload(); }
+
+        // --- CARGA DE DATOS ---
+        async function fetchIntegrantes() {
+            try {
+                const resp = await fetch(`${MOTOR_URL}?action=getIntegrantes&sheetId=${encodeURIComponent(session.sheetId)}`);
+                let data = await resp.json();
+                session.masterList = data.sort((a, b) => {
+                    return findInstrumentIndex(normalizeText(a.i)) - findInstrumentIndex(normalizeText(b.i));
+                });
+            } catch (e) { console.error("Error al cargar músicos"); }
+        }
+
+        // --- NAVEGACIÓN Y UTILIDADES ---
+        function nav(id) {
+            document.querySelectorAll('body > div').forEach(d => d.id !== 'loader' && d.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            if(id === 'screen-activity') document.getElementById('event-date').valueAsDate = new Date();
+            if(id === 'screen-list') renderSection(currentFamily);
+        }
+
+        function normalizeText(text) {
+            return text.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+        }
+
+        function findInstrumentIndex(text) {
+            for (let i = 0; i < INSTRUMENT_ORDER.length; i++) {
+                let key = normalizeText(INSTRUMENT_ORDER[i]);
+                if (text.includes(key) || key.includes(text)) return i;
+            }
+            return 99;
+        }
+
+        function toggleEventDesc() {
+            const isEvent = document.getElementById('event-type').value === 'Evento';
+            document.getElementById('event-desc-box').classList.toggle('hidden', !isEvent);
+        }
+
+        // --- LÓGICA DE ASISTENCIA ---
+        function initAttendance(proc) {
+            session.process = proc;
+            session.date = document.getElementById('event-date').value;
+            session.type = document.getElementById('event-type').value;
+            session.act = session.type === 'Ensayo' ? 'ENSAYO REGULAR' : document.getElementById('event-desc').value.toUpperCase();
+            if(!session.act && session.type === 'Evento') { alert("COMPLETE EL NOMBRE DEL EVENTO"); return; }
+            document.getElementById('info-header').innerText = `${proc} • ${session.act}`;
+            nav('screen-list');
+        }
+
+        function renderSection(fam) {
+            currentFamily = fam;
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.replace('active-tab', 'text-slate-300');
+                if(b.innerText.trim().toUpperCase() === fam.toUpperCase()) b.classList.add('active-tab');
+            });
+
+            const box = document.getElementById('musicos-box');
+            box.innerHTML = "";
+            const filtered = session.masterList.filter(m => 
+                m.p.trim().toUpperCase() === session.process.toUpperCase() && 
+                (fam === 'TODOS' || normalizeText(m.f).includes(normalizeText(fam)))
+            );
+
+            filtered.forEach(m => {
+                const sel = record[m.n] || '';
+                const card = document.createElement('div');
+                card.className = `card-musico p-5 rounded-[25px] shadow-sm ${getFamClass(m.f)} transition-all border border-slate-100/50`;
+                card.innerHTML = `
+                    <div class="mb-4">
+                        <p class="font-extrabold text-slate-800 text-[13px] leading-tight uppercase tracking-tight">${m.n}</p>
+                        <p class="text-[8px] text-slate-500 font-bold uppercase tracking-widest mt-1">${m.i}</p>
+                    </div>
+                    <div class="grid grid-cols-4 gap-1">
+                        ${['PRESENTE','AUSENTE','RETARDO','EXCUSA'].map(s => `
+                            <button onclick="mark('${m.n}','${s}', this)" class="btn-status p-2 py-3 rounded-xl transition-all 
+                            ${sel === s ? getCol(s) : 'bg-white/60 border-slate-200'}">${s}</button>
+                        `).join('')}
+                    </div>`;
+                box.appendChild(card);
+            });
+        }
+
+        function getFamClass(f) {
+            const fam = normalizeText(f);
+            if(fam.includes("MADERA")) return "bg-maderas";
+            if(fam.includes("BRONCE")) return "bg-bronces";
+            if(fam.includes("CUERDA")) return "bg-cuerdas";
+            if(fam.includes("PERCUSION")) return "bg-percusion";
+            return "bg-white border-slate-100";
+        }
+
+        function getCol(s) {
+            const cols = { PRESENTE: 'bg-green-600 border-green-600', AUSENTE: 'bg-red-600 border-red-600', RETARDO: 'bg-orange-500 border-orange-500', EXCUSA: 'bg-blue-600 border-blue-600' };
+            return `${cols[s]} text-white shadow-md font-black border-transparent`;
+        }
+
+        function mark(nom, est, btn) {
+            record[nom] = est;
+            document.getElementById('counter').innerText = `${Object.keys(record).length} REGISTROS`;
+            btn.parentElement.querySelectorAll('button').forEach(b => b.className = "btn-status p-2 py-3 rounded-xl transition-all bg-white/60 border-slate-200");
+            btn.className = `btn-status p-2 py-3 rounded-xl transition-all ${getCol(est)}`;
+        }
+
+        function filterList() {
+            const q = normalizeText(document.getElementById('search').value);
+            document.querySelectorAll('.card-musico').forEach(c => {
+                c.style.display = normalizeText(c.innerText).includes(q) ? 'block' : 'none';
+            });
+        }
+
+        // --- FINALIZAR Y REPORTAR ---
+        function confirmFinalize() {
+            if(Object.keys(record).length === 0) return alert("NO HAY DATOS");
+            if(confirm("¿DESEA FINALIZAR Y GUARDAR ESTE REGISTRO EN EL DRIVE?")) finalize();
+        }
+
+        async function finalize() {
+            toggleLoader(true);
+            const rows = Object.entries(record).map(([nom, est]) => [session.date, session.type, session.act, session.process, nom, est, session.user]);
+            try {
+                await fetch(MOTOR_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'saveAsistencia', sheetId: session.sheetId, asistencia: rows }) });
+                alert("✅ REGISTRO GUARDADO CON ÉXITO");
+                record = {};
+                document.getElementById('counter').innerText = "0 REGISTROS";
+                nav('screen-process');
+            } catch (e) { alert("ERROR AL GUARDAR"); }
+            toggleLoader(false);
+        }
+
+        function whatsappReport() {
+            const abs = session.masterList.filter(m => m.p.trim().toUpperCase() === session.process.toUpperCase() && record[m.n] === 'AUSENTE');
+            const ret = session.masterList.filter(m => m.p.trim().toUpperCase() === session.process.toUpperCase() && record[m.n] === 'RETARDO');
+            if(abs.length === 0 && ret.length === 0) return alert("SIN NOVEDADES PARA REPORTAR");
+            
+            let bandName = `BANDA SINFÓNICA ${document.getElementById('display-band-name').innerText}`;
+            let txt = `📢 *REPORTE DE ASISTENCIA*\n🏛️ *${bandName}*\n📅 *FECHA:* ${session.date}\n👥 *PROCESO:* ${session.process}\n`;
+            if(abs.length > 0) { txt += `\n❌ *AUSENCIAS:*\n`; abs.forEach(m => txt += `• ${m.n} (${m.i})\n`); }
+            if(ret.length > 0) { txt += `\n⏳ *RETARDOS:*\n`; ret.forEach(m => txt += `• ${m.n} (${m.i})\n`); }
+            window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`);
+        }
+
+        function toggleLoader(v) { document.getElementById('loader').classList.toggle('hidden', !v); }
     </script>
 </body>
 </html>
