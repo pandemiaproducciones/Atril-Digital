@@ -3,38 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sinfónica App - Gestión Maestro</title>
+    <title>SINFÓNICA APP - CONTROL MAESTRO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
-        body { font-family: 'Montserrat', sans-serif; }
         .hidden { display: none; }
         .loader { border-top-color: #1e40af; animation: spinner 1.5s linear infinite; }
         @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .active-tab { border-bottom: 4px solid #1e40af; color: #1e40af; font-weight: 900; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .pulse-loading { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
     </style>
 </head>
-<body class="bg-slate-100 min-h-screen">
+<body class="bg-slate-100 min-h-screen font-sans">
 
-    <div id="loader" class="hidden fixed inset-0 bg-white/90 z-50 flex flex-col items-center justify-center">
-        <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
-        <p class="text-blue-900 font-black animate-pulse uppercase tracking-tighter">Conectando con el Cerebro...</p>
+    <div id="loader" class="hidden fixed inset-0 bg-white/95 z-50 flex flex-col items-center justify-center">
+        <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-16 w-16 mb-4"></div>
+        <p class="text-blue-900 font-black italic uppercase tracking-tighter pulse-loading">Procesando datos...</p>
+        <p class="text-[10px] text-slate-400 font-bold mt-2">NO CIERRE LA APLICACIÓN</p>
     </div>
 
     <div id="screen-login" class="flex items-center justify-center min-h-screen p-4">
         <div class="bg-white p-8 rounded-[40px] shadow-2xl w-full max-w-sm border-t-8 border-blue-900 text-center">
             <h1 class="text-3xl font-black text-slate-800 mb-2 italic uppercase">SINFÓNICA</h1>
-            <p class="text-gray-400 text-[10px] mb-8 uppercase tracking-widest font-bold italic">Control Maestro</p>
+            <p class="text-gray-400 text-[10px] mb-8 uppercase tracking-widest font-bold italic">CONTROL MAESTRO</p>
             <div class="space-y-3">
                 <input type="text" id="user-input" placeholder="USUARIO" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-blue-500 transition-all text-center font-bold">
                 <input type="password" id="pass-input" placeholder="CONTRASEÑA" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-blue-500 transition-all text-center text-2xl tracking-widest">
-                <button onclick="loginProcess()" class="w-full bg-blue-900 text-white p-5 rounded-2xl font-black hover:bg-blue-800 transition-all shadow-lg active:scale-95 uppercase">INGRESAR</button>
+                <button onclick="loginProcess()" class="w-full bg-blue-900 text-white p-5 rounded-2xl font-black hover:bg-blue-800 transition-all shadow-lg active:scale-95 uppercase">Ingresar</button>
             </div>
-            <p id="login-error" class="text-red-500 text-xs mt-6 hidden font-bold bg-red-50 p-2 rounded-lg italic text-center uppercase">Datos inválidos</p>
+            <p id="login-error" class="text-red-500 text-xs mt-6 hidden font-bold bg-red-50 p-2 rounded-lg italic text-center">DATOS INVÁLIDOS</p>
         </div>
     </div>
 
@@ -42,10 +41,10 @@
         <div class="bg-white p-5 sticky top-0 z-20 shadow-sm border-b">
             <div class="flex justify-between items-center mb-4">
                 <button onclick="nav('screen-process')" class="text-blue-600 font-black text-[10px] uppercase italic">← OTRO NIVEL</button>
-                <span id="counter" class="text-[9px] bg-slate-900 text-white px-3 py-1 rounded-full font-bold italic uppercase">0 MARCADOS</span>
+                <span id="counter" class="text-[9px] bg-slate-900 text-white px-3 py-1 rounded-full font-bold italic uppercase">0 Marcados</span>
             </div>
             <p id="info-header" class="font-black text-xs text-slate-500 italic uppercase mb-3"></p>
-            <input type="text" id="search" onkeyup="filterList()" placeholder="BUSCAR INTEGRANTE..." class="w-full p-4 bg-slate-100 rounded-2xl outline-none font-bold text-sm mb-4">
+            <input type="text" id="search" onkeyup="filterList()" placeholder="Buscar integrante..." class="w-full p-4 bg-slate-100 rounded-2xl outline-none font-bold text-sm mb-4">
             <div class="flex gap-6 overflow-x-auto no-scrollbar text-[10px] font-black uppercase tracking-tighter border-t pt-3">
                 <button onclick="renderSection('MADERAS')" class="tab-btn active-tab pb-2">MADERAS</button>
                 <button onclick="renderSection('BRONCES')" class="tab-btn text-slate-300 pb-2">BRONCES</button>
@@ -57,63 +56,83 @@
         <div id="musicos-box" class="p-5 space-y-4"></div>
 
         <div class="fixed bottom-0 bg-white/95 backdrop-blur-sm w-full p-6 border-t shadow-2xl flex gap-2">
-            <button onclick="finalize()" class="flex-[2] bg-blue-900 text-white p-5 rounded-2xl font-black shadow-xl active:scale-95 transition-all uppercase italic tracking-widest text-[10px]">Guardar Drive</button>
-            <button onclick="generarPDF()" class="flex-1 bg-slate-800 text-white p-5 rounded-2xl font-black active:scale-95 transition-all text-center text-[10px] shadow-lg uppercase">PDF</button>
-            <button onclick="whatsappReport()" class="flex-1 bg-emerald-500 text-white p-5 rounded-2xl font-black active:scale-95 transition-all text-center text-[10px] shadow-lg uppercase">WA</button>
+            <button onclick="finalize()" class="flex-[2] bg-blue-900 text-white p-5 rounded-2xl font-black shadow-xl active:scale-95 transition-all uppercase italic tracking-tighter text-xs">Guardar Drive</button>
+            <button onclick="prepararPDF()" class="flex-1 bg-slate-800 text-white p-5 rounded-2xl font-black active:scale-95 transition-all text-center text-xs shadow-lg uppercase italic">PDF</button>
+            <button onclick="whatsappReport()" class="flex-1 bg-emerald-500 text-white p-5 rounded-2xl font-black active:scale-95 transition-all text-center text-xs shadow-lg uppercase italic">WA</button>
         </div>
     </div>
 
     <script>
-        // ... (Tus funciones loginProcess, fetchIntegrantes, nav, etc., se mantienen)
+        // ... (Lógica de login y fetchIntegrantes se mantiene) ...
 
-        function generarPDF() {
+        // NUEVA FUNCIÓN PARA PREPARAR DATOS DEL PDF
+        function prepararPDF() {
+            if(Object.keys(record).length === 0) return alert("NO HAY DATOS PARA EL REPORTE");
+            
+            toggleLoader(true);
+            
+            // Mapeamos los datos para el formato de la función PDF
+            const listaParaPDF = session.masterList
+                .filter(m => m.p.trim() === session.process)
+                .map(m => ({
+                    nombre: m.n,
+                    instrumento: m.i,
+                    estado: record[m.n] || "SIN REGISTRO"
+                }));
+
+            setTimeout(() => {
+                generarReportePDF(session.banda, session.act, listaParaPDF, session.user);
+                toggleLoader(false);
+            }, 800);
+        }
+
+        const generarReportePDF = (nombreBanda, tipoActividad, listaAsistencia, usuarioRegistra) => {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
+            const azulBanda = [30, 64, 175]; // El blue-900 de Tailwind
+
+            // ENCABEZADO ESTILO SINFÓNICA
+            doc.setFillColor(azulBanda[0], azulBanda[1], azulBanda[2]);
+            doc.rect(0, 0, 210, 40, 'F');
             
-            // Estilo inspirado en tu App
-            const azulSinfonica = [30, 64, 175];
-            const fechaActual = new Date().toLocaleDateString('es-ES', { 
-                year: 'numeric', month: 'long', day: 'numeric' 
-            });
-
-            // ENCABEZADO PROFESIONAL
+            doc.setTextColor(255, 255, 255);
             doc.setFont("helvetica", "bold");
-            doc.setFontSize(20);
-            doc.setTextColor(azulSinfonica[0], azulSinfonica[1], azulSinfonica[2]);
-            doc.text("REPORTE DE ASISTENCIA", 105, 20, { align: "center" });
-
+            doc.setFontSize(22);
+            doc.text("SINFÓNICA APP", 14, 20);
             doc.setFontSize(10);
-            doc.setTextColor(100);
-            doc.text(`BANDA: ${session.banda.toUpperCase()}`, 14, 35);
-            doc.text(`NIVEL: ${session.process.toUpperCase()}`, 14, 40);
-            doc.text(`FECHA: ${fechaActual}`, 14, 45);
-            doc.text(`REGISTRADO POR: ${session.user.toUpperCase()}`, 14, 50);
+            doc.text("REPORTE OFICIAL DE ASISTENCIA", 14, 30);
 
-            // DATOS PARA LA TABLA
-            const body = session.masterList
-                .filter(m => m.p.trim() === session.process)
-                .map(m => [m.n, m.i, record[m.n] || 'SIN MARCAR']);
+            // INFO GENERAL
+            doc.setTextColor(60, 60, 60);
+            doc.setFontSize(11);
+            doc.text(`BANDA: ${nombreBanda.toUpperCase()}`, 14, 50);
+            doc.text(`ACTIVIDAD: ${tipoActividad.toUpperCase()}`, 14, 57);
+            doc.text(`FECHA: ${new Date().toLocaleDateString()}`, 14, 64);
+            doc.text(`REGISTRADO POR: ${usuarioRegistra.toUpperCase()}`, 14, 71);
 
+            // TABLA
             doc.autoTable({
-                startY: 60,
+                startY: 80,
                 head: [['ESTUDIANTE', 'INSTRUMENTO', 'ESTADO']],
-                body: body,
-                headStyles: { fillColor: azulSinfonica, fontStyle: 'bold' },
-                styles: { fontSize: 9 },
+                body: listaAsistencia.map(e => [e.nombre, e.instrumento, e.estado]),
+                headStyles: { fillColor: azulBanda },
                 didParseCell: function(data) {
-                    if (data.section === 'body' && data.column.index === 2) {
-                        if (data.cell.raw === "A") {
-                            data.cell.styles.textColor = [200, 0, 0];
-                            data.cell.styles.fontStyle = 'bold';
-                        }
+                    if (data.cell.raw === "A") {
+                        data.cell.styles.textColor = [220, 0, 0];
+                        data.cell.styles.fontStyle = 'bold';
                     }
                 }
             });
 
-            doc.save(`Asistencia_${session.banda}_${session.process}.pdf`);
+            doc.save(`Reporte_${nombreBanda}_${session.process}.pdf`);
+        };
+
+        function toggleLoader(v) { 
+            const l = document.getElementById('loader');
+            v ? l.classList.remove('hidden') : l.classList.add('hidden');
         }
 
-        // ... (Resto de tus funciones mark, finalize, whatsappReport)
+        // ... (Resto de funciones: nav, renderSection, mark, etc.) ...
     </script>
 </body>
 </html>
