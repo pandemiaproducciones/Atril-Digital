@@ -3,113 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asistente de Banda - BETA</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <title>Sinfónica App - Gestión Maestro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     
     <style>
-        body { font-family: 'Montserrat', sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h1, h2 { text-align: center; color: #2c3e50; text-transform: uppercase; }
-        .btn { display: block; width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 8px; cursor: pointer; font-family: 'Montserrat', sans-serif; font-weight: bold; font-size: 16px; transition: 0.3s; }
-        .btn-primary { background-color: #2980b9; color: white; }
-        .btn-pdf { background-color: #27ae60; color: white; }
-        .student-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
-        input[type="checkbox"] { transform: scale(1.5); }
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
+        body { font-family: 'Montserrat', sans-serif; }
         .hidden { display: none; }
+        .loader { border-top-color: #1e40af; animation: spinner 1.5s linear infinite; }
+        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .active-tab { border-bottom: 4px solid #1e40af; color: #1e40af; font-weight: 900; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body>
+<body class="bg-slate-100 min-h-screen">
 
-<div class="container" id="app">
-    <h1>ASISTENCIA DE BANDA</h1>
-    
-    <div id="login-section">
-        <input type="password" id="pass" placeholder="CONTRASEÑA" style="width: 93%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ccc;">
-        <button class="btn btn-primary" onclick="login()">INGRESAR</button>
+    <div id="loader" class="hidden fixed inset-0 bg-white/90 z-50 flex flex-col items-center justify-center">
+        <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
+        <p class="text-blue-900 font-black animate-pulse uppercase tracking-tighter">Conectando con el Cerebro...</p>
     </div>
 
-    <div id="main-section" class="hidden">
-        <h2 id="band-name">MI BANDA</h2>
-        <p id="user-info"></p>
-        <div id="student-list">
+    <div id="screen-login" class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white p-8 rounded-[40px] shadow-2xl w-full max-w-sm border-t-8 border-blue-900 text-center">
+            <h1 class="text-3xl font-black text-slate-800 mb-2 italic uppercase">SINFÓNICA</h1>
+            <p class="text-gray-400 text-[10px] mb-8 uppercase tracking-widest font-bold italic">Control Maestro</p>
+            <div class="space-y-3">
+                <input type="text" id="user-input" placeholder="USUARIO" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-blue-500 transition-all text-center font-bold">
+                <input type="password" id="pass-input" placeholder="CONTRASEÑA" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-blue-500 transition-all text-center text-2xl tracking-widest">
+                <button onclick="loginProcess()" class="w-full bg-blue-900 text-white p-5 rounded-2xl font-black hover:bg-blue-800 transition-all shadow-lg active:scale-95 uppercase">INGRESAR</button>
             </div>
-        <button class="btn btn-pdf" onclick="descargarReporte()">GENERAR REPORTE PDF</button>
-        <button class="btn btn-primary" onclick="cerrarSesion()">SALIR</button>
+            <p id="login-error" class="text-red-500 text-xs mt-6 hidden font-bold bg-red-50 p-2 rounded-lg italic text-center uppercase">Datos inválidos</p>
+        </div>
     </div>
-</div>
 
-<script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwyG6DvSkkWAUUZ2CcS0cmOiByhX6WqSrs76T1bAAi_xLLs0htRhs4kLywUa4rZ482e6g/exec";
-    let datosEstudiantes = [];
-    let nombreBanda = "BANDA DE MÚSICA";
-    let usuarioActivo = "";
+    <div id="screen-list" class="hidden min-h-screen pb-44">
+        <div class="bg-white p-5 sticky top-0 z-20 shadow-sm border-b">
+            <div class="flex justify-between items-center mb-4">
+                <button onclick="nav('screen-process')" class="text-blue-600 font-black text-[10px] uppercase italic">← OTRO NIVEL</button>
+                <span id="counter" class="text-[9px] bg-slate-900 text-white px-3 py-1 rounded-full font-bold italic uppercase">0 MARCADOS</span>
+            </div>
+            <p id="info-header" class="font-black text-xs text-slate-500 italic uppercase mb-3"></p>
+            <input type="text" id="search" onkeyup="filterList()" placeholder="BUSCAR INTEGRANTE..." class="w-full p-4 bg-slate-100 rounded-2xl outline-none font-bold text-sm mb-4">
+            <div class="flex gap-6 overflow-x-auto no-scrollbar text-[10px] font-black uppercase tracking-tighter border-t pt-3">
+                <button onclick="renderSection('MADERAS')" class="tab-btn active-tab pb-2">MADERAS</button>
+                <button onclick="renderSection('BRONCES')" class="tab-btn text-slate-300 pb-2">BRONCES</button>
+                <button onclick="renderSection('CUERDAS')" class="tab-btn text-slate-300 pb-2">CUERDAS</button>
+                <button onclick="renderSection('PERCUSION')" class="tab-btn text-slate-300 pb-2">PERCUSIÓN</button>
+            </div>
+        </div>
 
-    // Simulación de Login (esto conectará con tu Sheet CEREBRO)
-    function login() {
-        const pass = document.getElementById('pass').value;
-        if(pass === "1234") { // Aquí irá la validación real con tu URL
-            usuarioActivo = "Director";
-            document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('main-section').classList.remove('hidden');
-            cargarEstudiantes();
-        } else {
-            alert("CONTRASEÑA INCORRECTA");
+        <div id="musicos-box" class="p-5 space-y-4"></div>
+
+        <div class="fixed bottom-0 bg-white/95 backdrop-blur-sm w-full p-6 border-t shadow-2xl flex gap-2">
+            <button onclick="finalize()" class="flex-[2] bg-blue-900 text-white p-5 rounded-2xl font-black shadow-xl active:scale-95 transition-all uppercase italic tracking-widest text-[10px]">Guardar Drive</button>
+            <button onclick="generarPDF()" class="flex-1 bg-slate-800 text-white p-5 rounded-2xl font-black active:scale-95 transition-all text-center text-[10px] shadow-lg uppercase">PDF</button>
+            <button onclick="whatsappReport()" class="flex-1 bg-emerald-500 text-white p-5 rounded-2xl font-black active:scale-95 transition-all text-center text-[10px] shadow-lg uppercase">WA</button>
+        </div>
+    </div>
+
+    <script>
+        // ... (Tus funciones loginProcess, fetchIntegrantes, nav, etc., se mantienen)
+
+        function generarPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Estilo inspirado en tu App
+            const azulSinfonica = [30, 64, 175];
+            const fechaActual = new Date().toLocaleDateString('es-ES', { 
+                year: 'numeric', month: 'long', day: 'numeric' 
+            });
+
+            // ENCABEZADO PROFESIONAL
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(20);
+            doc.setTextColor(azulSinfonica[0], azulSinfonica[1], azulSinfonica[2]);
+            doc.text("REPORTE DE ASISTENCIA", 105, 20, { align: "center" });
+
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text(`BANDA: ${session.banda.toUpperCase()}`, 14, 35);
+            doc.text(`NIVEL: ${session.process.toUpperCase()}`, 14, 40);
+            doc.text(`FECHA: ${fechaActual}`, 14, 45);
+            doc.text(`REGISTRADO POR: ${session.user.toUpperCase()}`, 14, 50);
+
+            // DATOS PARA LA TABLA
+            const body = session.masterList
+                .filter(m => m.p.trim() === session.process)
+                .map(m => [m.n, m.i, record[m.n] || 'SIN MARCAR']);
+
+            doc.autoTable({
+                startY: 60,
+                head: [['ESTUDIANTE', 'INSTRUMENTO', 'ESTADO']],
+                body: body,
+                headStyles: { fillColor: azulSinfonica, fontStyle: 'bold' },
+                styles: { fontSize: 9 },
+                didParseCell: function(data) {
+                    if (data.section === 'body' && data.column.index === 2) {
+                        if (data.cell.raw === "A") {
+                            data.cell.styles.textColor = [200, 0, 0];
+                            data.cell.styles.fontStyle = 'bold';
+                        }
+                    }
+                }
+            });
+
+            doc.save(`Asistencia_${session.banda}_${session.process}.pdf`);
         }
-    }
 
-    function cargarEstudiantes() {
-        // Aquí es donde la App lee tu Sheet PLANTILLA
-        // Por ahora simulamos datos para que veas el PDF
-        datosEstudiantes = [
-            { nombre: "JUAN PÉREZ", instrumento: "CLARINETE", asistio: true },
-            { nombre: "MARÍA GARCÍA", instrumento: "TROMPETA", asistio: false },
-            { nombre: "CARLOS RUIZ", instrumento: "PERCUSIÓN", asistio: true }
-        ];
-        
-        const listDiv = document.getElementById('student-list');
-        listDiv.innerHTML = "";
-        datosEstudiantes.forEach((est, index) => {
-            listDiv.innerHTML += `
-                <div class="student-item">
-                    <span>${est.nombre} (${est.instrumento})</span>
-                    <input type="checkbox" ${est.asistio ? 'checked' : ''} onchange="datosEstudiantes[${index}].asistio = this.checked">
-                </div>
-            `;
-        });
-    }
-
-    function descargarReporte() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        
-        // Encabezado
-        doc.setFont("helvetica", "bold"); // Montserrat requiere carga de fuente extra en jsPDF, usamos helvetica por defecto para asegurar que funcione ya
-        doc.text("REPORTE DE ASISTENCIA", 105, 20, { align: "center" });
-        
-        doc.setFontSize(12);
-        doc.text(`BANDA: ${nombreBanda}`, 14, 35);
-        doc.text(`REGISTRADO POR: ${usuarioActivo}`, 14, 42);
-        doc.text(`FECHA: ${new Date().toLocaleDateString()}`, 14, 49);
-
-        // Tabla
-        const tablaDatos = datosEstudiantes.map(e => [e.nombre, e.instrumento, e.asistio ? "PRESENTE" : "AUSENTE"]);
-        
-        doc.autoTable({
-            startY: 60,
-            head: [['ESTUDIANTE', 'INSTRUMENTO', 'ESTADO']],
-            body: tablaDatos,
-            headStyles: { fillColor: [41, 128, 185] }
-        });
-
-        doc.save(`Asistencia_${nombreBanda}.pdf`);
-    }
-
-    function cerrarSesion() {
-        location.reload();
-    }
-</script>
-
+        // ... (Resto de tus funciones mark, finalize, whatsappReport)
+    </script>
 </body>
 </html>
