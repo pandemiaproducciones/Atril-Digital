@@ -20,7 +20,7 @@
 
     <div id="loader" class="hidden fixed inset-0 bg-white/95 z-50 flex flex-col items-center justify-center">
         <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-14 w-14 mb-4"></div>
-        <p id="loader-text" class="text-blue-900 font-black italic uppercase pulse text-center px-6 tracking-tighter uppercase">CONECTANDO CON EL CEREBRO...</p>
+        <p id="loader-text" class="text-blue-900 font-black italic uppercase pulse text-center px-6 tracking-tighter">CONECTANDO CON EL CEREBRO...</p>
     </div>
 
     <div id="screen-login" class="flex items-center justify-center min-h-screen p-4">
@@ -28,7 +28,7 @@
             <h1 class="text-3xl font-black text-slate-800 mb-2 italic uppercase">SINFÓNICA</h1>
             <p class="text-gray-400 text-[10px] mb-8 uppercase tracking-widest font-bold italic">CONTROL MAESTRO</p>
             <div class="space-y-3">
-                <input type="text" id="user-input" placeholder="USUARIO" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-blue-500 transition-all text-center font-bold uppercase">
+                <input type="text" id="user-input" placeholder="USUARIO" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-blue-500 transition-all text-center font-bold uppercase text-slate-700">
                 <input type="password" id="pass-input" placeholder="CONTRASEÑA" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-blue-500 transition-all text-center text-2xl tracking-widest">
                 <button onclick="loginProcess()" class="w-full bg-blue-900 text-white p-5 rounded-2xl font-black shadow-lg active:scale-95 uppercase italic">INGRESAR</button>
             </div>
@@ -63,7 +63,7 @@
             </div>
             <div>
                 <label class="block text-[10px] font-black text-blue-500 mb-2 uppercase tracking-widest">MODALIDAD</label>
-                <select id="event-type" onchange="toggleEventDesc()" class="w-full p-4 bg-slate-50 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-500">
+                <select id="event-type" onchange="toggleEventDesc()" class="w-full p-4 bg-slate-50 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-500 text-slate-700">
                     <option value="Ensayo">ENSAYO REGULAR</option>
                     <option value="Evento">EVENTO ESPECIAL</option>
                 </select>
@@ -77,7 +77,7 @@
 
     <div id="screen-process" class="hidden p-6 max-w-md mx-auto space-y-4 text-center">
         <button onclick="nav('screen-activity')" class="text-blue-600 font-black mb-4 text-xs uppercase flex items-center">← VOLVER</button>
-        <h2 class="text-xl font-black italic mb-8 text-slate-800 uppercase">SELECCIONE NIVEL</h2>
+        <h2 class="text-xl font-black italic mb-8 text-slate-800 uppercase tracking-tighter">SELECCIONE NIVEL</h2>
         <button onclick="initAttendance('PREBANDA')" class="w-full p-8 bg-white rounded-[30px] shadow-md font-black text-left border-r-8 border-green-400 uppercase italic">PREBANDA</button>
         <button onclick="initAttendance('BANDA INFANTIL')" class="w-full p-8 bg-white rounded-[30px] shadow-md font-black text-left border-r-8 border-blue-400 uppercase italic text-blue-900">BANDA INFANTIL</button>
         <button onclick="initAttendance('BANDA TITULAR')" class="w-full p-8 bg-white rounded-[30px] shadow-md font-black text-left border-r-8 border-slate-800 uppercase italic">BANDA TITULAR</button>
@@ -92,11 +92,11 @@
             <p id="info-header" class="font-black text-xs text-slate-500 italic uppercase mb-3 tracking-tighter"></p>
             <input type="text" id="search" onkeyup="filterList()" placeholder="BUSCAR INTEGRANTE..." class="w-full p-4 bg-slate-100 rounded-2xl outline-none font-bold text-sm mb-4">
             <div class="flex gap-6 overflow-x-auto no-scrollbar text-[10px] font-black uppercase tracking-tighter border-t pt-3">
-                <button onclick="renderSection('TODOS')" class="tab-btn active-tab pb-2">TODOS</button>
-                <button onclick="renderSection('MADERAS')" class="tab-btn text-slate-300 pb-2">MADERAS</button>
-                <button onclick="renderSection('BRONCES')" class="tab-btn text-slate-300 pb-2">BRONCES</button>
-                <button onclick="renderSection('CUERDAS')" class="tab-btn text-slate-300 pb-2">CUERDAS</button>
-                <button onclick="renderSection('PERCUSION')" class="tab-btn text-slate-300 pb-2">PERCUSIÓN</button>
+                <button onclick="renderSection('TODOS')" id="tab-TODOS" class="tab-btn active-tab pb-2">TODOS</button>
+                <button onclick="renderSection('MADERAS')" id="tab-MADERAS" class="tab-btn text-slate-300 pb-2">MADERAS</button>
+                <button onclick="renderSection('BRONCES')" id="tab-BRONCES" class="tab-btn text-slate-300 pb-2">BRONCES</button>
+                <button onclick="renderSection('CUERDAS')" id="tab-CUERDAS" class="tab-btn text-slate-300 pb-2">CUERDAS</button>
+                <button onclick="renderSection('PERCUSION')" id="tab-PERCUSION" class="tab-btn text-slate-300 pb-2">PERCUSIÓN</button>
             </div>
         </div>
         <div id="musicos-box" class="p-5 space-y-4"></div>
@@ -111,14 +111,12 @@
         const MOTOR_URL = "https://script.google.com/macros/s/AKfycbwSPm9_cqec1f3bwNuPKZxYpHBBkiAlqE6F1pu8P0C5B5LNhY9QPmS9QcH4RReApSSn4w/exec";
         let session = { user: "", banda: "", sheetId: "", date: "", type: "", act: "", process: "", masterList: [] };
         let record = {};
-        let currentFamily = "TODOS";
 
         function toggleLoader(v, text = "CONECTANDO CON EL CEREBRO...") {
             document.getElementById('loader-text').innerText = text;
             document.getElementById('loader').classList.toggle('hidden', !v);
         }
 
-        // 1. Establecer fecha de hoy automáticamente
         function setTodayDate() {
             const now = new Date();
             const year = now.getFullYear();
@@ -164,7 +162,7 @@
             document.querySelectorAll('body > div').forEach(d => d.id !== 'loader' && d.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
             if(id === 'screen-activity') setTodayDate();
-            if(id === 'screen-list') renderSection('TODOS'); // Iniciar siempre en TODOS
+            if(id === 'screen-list') renderSection('TODOS'); 
         }
 
         function toggleEventDesc() {
@@ -182,19 +180,27 @@
             nav('screen-list');
         }
 
+        // Función para limpiar tildes al comparar
+        const cleanStr = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim();
+
         function renderSection(fam) {
-            currentFamily = fam;
+            // Actualizar estilo visual de las pestañas usando IDs únicos
             document.querySelectorAll('.tab-btn').forEach(b => {
-                b.classList.replace('active-tab', 'text-slate-300');
-                if(b.innerText === fam) b.classList.add('active-tab');
+                b.classList.remove('active-tab');
+                b.classList.add('text-slate-300');
             });
+            const activeBtn = document.getElementById(`tab-${fam}`);
+            if(activeBtn) {
+                activeBtn.classList.add('active-tab');
+                activeBtn.classList.remove('text-slate-300');
+            }
+
             const box = document.getElementById('musicos-box');
             box.innerHTML = "";
             
-            // 2. Lógica para filtrar por familia o mostrar TODOS
             const filtered = session.masterList.filter(m => {
                 const procMatch = m.proceso.trim() === session.process;
-                const famMatch = (fam === 'TODOS' || m.familia.trim().toUpperCase() === fam.toUpperCase());
+                const famMatch = (fam === 'TODOS' || cleanStr(m.familia) === cleanStr(fam));
                 return procMatch && famMatch;
             });
             
