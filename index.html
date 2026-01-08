@@ -14,14 +14,13 @@
         .active-tab { border-bottom: 4px solid #1e40af; color: #1e40af; font-weight: 900; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
     </style>
 </head>
 <body class="bg-slate-100 min-h-screen font-sans">
 
     <div id="loader" class="hidden fixed inset-0 bg-white/95 z-50 flex flex-col items-center justify-center">
         <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-14 w-14 mb-4"></div>
-        <p id="loader-text" class="text-blue-900 font-black italic uppercase pulse text-center px-6 tracking-tighter">CONECTANDO CON EL CEREBRO...</p>
+        <p id="loader-text" class="text-blue-900 font-black italic uppercase pulse text-center px-6 tracking-tighter uppercase">CONECTANDO CON EL CEREBRO...</p>
     </div>
 
     <div id="screen-login" class="flex items-center justify-center min-h-screen p-4">
@@ -47,7 +46,7 @@
         </div>
         <button onclick="nav('screen-activity')" class="w-full bg-white p-8 rounded-[35px] shadow-sm border-b-4 border-blue-600 flex justify-between items-center group active:scale-95 transition-all">
             <div class="text-left">
-                <p class="font-black text-slate-800 text-lg italic uppercase">ASISTENCIA</p>
+                <p class="font-black text-slate-800 text-lg italic uppercase tracking-tighter">ASISTENCIA</p>
                 <p class="text-[10px] text-slate-400 font-bold uppercase">NUEVO REGISTRO DIARIO</p>
             </div>
             <span class="text-3xl">📋</span>
@@ -59,18 +58,18 @@
         <div class="space-y-6 bg-white p-8 rounded-[35px] shadow-xl">
             <h2 class="text-2xl font-black italic text-slate-800 mb-2 uppercase">DETALLES</h2>
             <div>
-                <label class="block text-[10px] font-black text-blue-500 mb-2 uppercase">FECHA</label>
+                <label class="block text-[10px] font-black text-blue-500 mb-2 uppercase tracking-widest">FECHA DEL REPORTE</label>
                 <input type="date" id="event-date" class="w-full p-4 bg-slate-50 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-500">
             </div>
             <div>
-                <label class="block text-[10px] font-black text-blue-500 mb-2 uppercase">MODALIDAD</label>
+                <label class="block text-[10px] font-black text-blue-500 mb-2 uppercase tracking-widest">MODALIDAD</label>
                 <select id="event-type" onchange="toggleEventDesc()" class="w-full p-4 bg-slate-50 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-500">
                     <option value="Ensayo">ENSAYO REGULAR</option>
                     <option value="Evento">EVENTO ESPECIAL</option>
                 </select>
             </div>
             <div id="event-desc-box" class="hidden">
-                <input type="text" id="event-desc" placeholder="NOMBRE DEL EVENTO" class="w-full p-4 bg-orange-50 border-2 border-orange-100 rounded-2xl outline-none font-bold italic uppercase">
+                <input type="text" id="event-desc" placeholder="NOMBRE DEL EVENTO" class="w-full p-4 bg-orange-50 border-2 border-orange-100 rounded-2xl outline-none font-bold italic uppercase tracking-tighter">
             </div>
             <button onclick="nav('screen-process')" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-black shadow-lg uppercase italic tracking-widest">SIGUIENTE</button>
         </div>
@@ -90,10 +89,11 @@
                 <button onclick="nav('screen-process')" class="text-blue-600 font-black text-[10px] uppercase italic">← VOLVER</button>
                 <span id="counter" class="text-[9px] bg-slate-900 text-white px-3 py-1 rounded-full font-bold italic uppercase">0 MARCADOS</span>
             </div>
-            <p id="info-header" class="font-black text-xs text-slate-500 italic uppercase mb-3"></p>
+            <p id="info-header" class="font-black text-xs text-slate-500 italic uppercase mb-3 tracking-tighter"></p>
             <input type="text" id="search" onkeyup="filterList()" placeholder="BUSCAR INTEGRANTE..." class="w-full p-4 bg-slate-100 rounded-2xl outline-none font-bold text-sm mb-4">
             <div class="flex gap-6 overflow-x-auto no-scrollbar text-[10px] font-black uppercase tracking-tighter border-t pt-3">
-                <button onclick="renderSection('MADERAS')" class="tab-btn active-tab pb-2">MADERAS</button>
+                <button onclick="renderSection('TODOS')" class="tab-btn active-tab pb-2">TODOS</button>
+                <button onclick="renderSection('MADERAS')" class="tab-btn text-slate-300 pb-2">MADERAS</button>
                 <button onclick="renderSection('BRONCES')" class="tab-btn text-slate-300 pb-2">BRONCES</button>
                 <button onclick="renderSection('CUERDAS')" class="tab-btn text-slate-300 pb-2">CUERDAS</button>
                 <button onclick="renderSection('PERCUSION')" class="tab-btn text-slate-300 pb-2">PERCUSIÓN</button>
@@ -111,11 +111,20 @@
         const MOTOR_URL = "https://script.google.com/macros/s/AKfycbwSPm9_cqec1f3bwNuPKZxYpHBBkiAlqE6F1pu8P0C5B5LNhY9QPmS9QcH4RReApSSn4w/exec";
         let session = { user: "", banda: "", sheetId: "", date: "", type: "", act: "", process: "", masterList: [] };
         let record = {};
-        let currentFamily = "MADERAS";
+        let currentFamily = "TODOS";
 
         function toggleLoader(v, text = "CONECTANDO CON EL CEREBRO...") {
             document.getElementById('loader-text').innerText = text;
             document.getElementById('loader').classList.toggle('hidden', !v);
+        }
+
+        // 1. Establecer fecha de hoy automáticamente
+        function setTodayDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            document.getElementById('event-date').value = `${year}-${month}-${day}`;
         }
 
         async function loginProcess() {
@@ -139,9 +148,7 @@
                 } else {
                     document.getElementById('login-error').classList.remove('hidden');
                 }
-            } catch (e) { 
-                document.getElementById('login-error').classList.remove('hidden');
-            }
+            } catch (e) { document.getElementById('login-error').classList.remove('hidden'); }
             toggleLoader(false);
         }
 
@@ -156,8 +163,8 @@
         function nav(id) {
             document.querySelectorAll('body > div').forEach(d => d.id !== 'loader' && d.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
-            if(id === 'screen-activity') document.getElementById('event-date').valueAsDate = new Date();
-            if(id === 'screen-list') renderSection(currentFamily);
+            if(id === 'screen-activity') setTodayDate();
+            if(id === 'screen-list') renderSection('TODOS'); // Iniciar siempre en TODOS
         }
 
         function toggleEventDesc() {
@@ -183,7 +190,13 @@
             });
             const box = document.getElementById('musicos-box');
             box.innerHTML = "";
-            const filtered = session.masterList.filter(m => m.proceso.trim() === session.process && m.familia.trim().toUpperCase() === fam.toUpperCase());
+            
+            // 2. Lógica para filtrar por familia o mostrar TODOS
+            const filtered = session.masterList.filter(m => {
+                const procMatch = m.proceso.trim() === session.process;
+                const famMatch = (fam === 'TODOS' || m.familia.trim().toUpperCase() === fam.toUpperCase());
+                return procMatch && famMatch;
+            });
             
             filtered.forEach(m => {
                 const sel = record[m.nombre] || '';
