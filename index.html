@@ -13,15 +13,13 @@
         @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .active-tab { border-bottom: 4px solid #1e40af; color: #1e40af; font-weight: 900; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        input[type="date"]::-webkit-inner-spin-button, 
-        input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; }
     </style>
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-900">
 
     <div id="loader" class="hidden fixed inset-0 bg-white/95 z-50 flex flex-col items-center justify-center">
         <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-14 w-14 mb-4"></div>
-        <p id="loader-text" class="text-blue-900 font-black italic uppercase text-center px-6">SINCRONIZANDO...</p>
+        <p id="loader-text" class="text-blue-900 font-black italic uppercase text-center px-6">SINCRONIZANDO CON CEREBRO...</p>
     </div>
 
     <div id="screen-login" class="flex items-center justify-center min-h-screen p-4">
@@ -33,7 +31,7 @@
                 <input type="password" id="pass-input" placeholder="CONTRASEÑA" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-blue-500 text-center text-2xl tracking-widest">
                 <button onclick="loginProcess()" class="w-full bg-blue-900 text-white p-5 rounded-2xl font-black shadow-lg uppercase italic">INGRESAR</button>
             </div>
-            <p id="login-error" class="text-red-500 text-xs mt-6 hidden font-bold bg-red-50 p-2 rounded-lg italic uppercase">DATOS INVÁLIDOS</p>
+            <p id="login-error" class="text-red-500 text-xs mt-6 hidden font-bold bg-red-50 p-2 rounded-lg italic uppercase">DATOS INVÁLIDOS O INACTIVO</p>
         </div>
     </div>
 
@@ -41,22 +39,22 @@
         <div class="flex justify-between items-center mb-10 mt-4">
             <div>
                 <p class="text-[10px] font-black text-blue-500 uppercase italic">DIRECTOR ACTIVO</p>
-                <h2 id="display-band-name" class="text-xl font-black text-slate-800 uppercase italic">Cargando...</h2>
+                <h2 id="display-band-name" class="text-xl font-black text-slate-800 uppercase italic leading-tight">Cargando...</h2>
             </div>
             <button onclick="location.reload()" class="bg-red-50 text-red-500 px-4 py-2 rounded-xl text-[10px] font-black uppercase">SALIR</button>
         </div>
         <button onclick="nav('screen-activity')" class="w-full bg-white p-8 rounded-[35px] shadow-sm border-b-4 border-blue-600 flex justify-between items-center active:scale-95 transition-all">
-            <div class="text-left"><p class="font-black text-slate-800 text-lg italic uppercase">ASISTENCIA</p></div>
+            <p class="font-black text-slate-800 text-lg italic uppercase">ASISTENCIA</p>
             <span class="text-3xl">📋</span>
         </button>
         <button onclick="nav('screen-add-student')" class="w-full bg-white p-8 rounded-[35px] shadow-sm border-b-4 border-emerald-500 flex justify-between items-center active:scale-95 transition-all">
-            <div class="text-left"><p class="font-black text-slate-800 text-lg italic uppercase">ESTUDIANTES</p></div>
+            <p class="font-black text-slate-800 text-lg italic uppercase">ESTUDIANTES</p>
             <span class="text-3xl">👤</span>
         </button>
     </div>
 
     <div id="screen-add-student" class="hidden p-6 max-w-md mx-auto pb-20">
-        <button onclick="nav('screen-menu')" class="text-blue-600 font-black mb-6 text-xs uppercase italic">← VOLVER</button>
+        <button onclick="nav('screen-menu')" class="text-blue-600 font-black mb-6 text-xs uppercase italic">← VOLVER AL MENÚ</button>
         <div class="space-y-4 bg-white p-8 rounded-[35px] shadow-xl">
             <h2 class="text-2xl font-black italic text-slate-800 mb-4 uppercase">NUEVO INTEGRANTE</h2>
             <input type="text" id="add-nombres" placeholder="NOMBRES" class="w-full p-3 bg-slate-50 rounded-xl font-bold uppercase outline-none border-2 border-transparent focus:border-emerald-500">
@@ -65,7 +63,7 @@
             <input type="text" id="add-fecha_nacimiento" placeholder="FECHA NAC (DD-MM-AAAA)" class="w-full p-3 bg-slate-50 rounded-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500">
             <input type="text" id="add-eps" placeholder="EPS" class="w-full p-3 bg-slate-50 rounded-xl font-bold uppercase outline-none border-2 border-transparent focus:border-emerald-500">
             
-            <label class="block text-[10px] font-black text-emerald-600 uppercase pt-2">SELECCIONES DE CONFIGURACIÓN</label>
+            <label class="block text-[10px] font-black text-emerald-600 uppercase pt-2">SELECCIONES DESDE CONFIGURACIÓN</label>
             <select id="add-proceso" class="w-full p-3 bg-slate-50 rounded-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500"></select>
             <select id="add-seccion" class="w-full p-3 bg-slate-50 rounded-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500"></select>
             <select id="add-instrumento" class="w-full p-3 bg-slate-50 rounded-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500"></select>
@@ -91,15 +89,15 @@
                 </select>
             </div>
             <div id="event-desc-box" class="hidden">
-                <input type="text" id="event-desc" placeholder="NOMBRE DE LA PRESENTACIÓN" class="w-full p-4 bg-orange-50 border-2 border-orange-100 rounded-2xl outline-none font-bold italic uppercase">
+                <input type="text" id="event-desc" placeholder="NOMBRE DE LA ACTIVIDAD" class="w-full p-4 bg-orange-50 border-2 border-orange-100 rounded-2xl outline-none font-bold italic uppercase">
             </div>
             <button onclick="nav('screen-process')" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-black shadow-lg uppercase italic tracking-widest">SIGUIENTE</button>
         </div>
     </div>
 
     <div id="screen-process" class="hidden p-6 max-w-md mx-auto space-y-4 text-center">
-        <button onclick="nav('screen-activity')" class="text-blue-600 font-black mb-4 text-xs uppercase italic flex items-center">← VOLVER</button>
-        <h2 class="text-xl font-black italic mb-8 text-slate-800 uppercase tracking-tighter">SELECCIONE NIVEL</h2>
+        <button onclick="nav('screen-activity')" class="text-blue-600 font-black mb-4 text-xs uppercase italic">← VOLVER</button>
+        <h2 class="text-xl font-black italic mb-8 text-slate-800 uppercase">SELECCIONE NIVEL</h2>
         <div id="process-buttons" class="space-y-4"></div>
     </div>
 
@@ -122,7 +120,7 @@
     </div>
 
     <script>
-        const MOTOR_URL = "https://script.google.com/macros/s/AKfycbyxmFxmiby4a_xWQIJGelsjKwXsM9Vjec67OfnVp_YbwjNuzJUKHnSjo2yh1zDC_PU4pQ/exec";
+        const MOTOR_URL = "https://script.google.com/macros/s/AKfycbwo2pAMjlvaSYXBTpaZFieOxHEj02cY9FDt7VTWVyPd3SbNPPNJaD-Q8cM4tkGb42E5cw/exec";
         let session = { user: "", banda: "", sheetId: "", date: "", type: "", act: "", process: "", masterList: [], config: {} };
         let record = {};
 
@@ -135,7 +133,7 @@
             const u = document.getElementById('user-input').value.trim();
             const p = document.getElementById('pass-input').value.trim();
             if(!u || !p) return;
-            toggleLoader(true);
+            toggleLoader(true, "CONECTANDO A CEREBRO...");
             try {
                 const resp = await fetch(`${MOTOR_URL}?action=login&user=${encodeURIComponent(u)}&pass=${encodeURIComponent(p)}`);
                 const data = await resp.json();
@@ -144,8 +142,11 @@
                     document.getElementById('display-band-name').innerText = session.banda;
                     await fetchFullData();
                     nav('screen-menu');
-                } else { document.getElementById('login-error').classList.remove('hidden'); }
-            } catch (e) { document.getElementById('login-error').classList.remove('hidden'); }
+                } else { 
+                    document.getElementById('login-error').innerText = data.message || "DATOS INVÁLIDOS";
+                    document.getElementById('login-error').classList.remove('hidden'); 
+                }
+            } catch (e) { alert("ERROR DE CONEXIÓN"); }
             toggleLoader(false);
         }
 
@@ -159,18 +160,21 @@
         }
 
         function populateSelects() {
-            const keys = ['proceso', 'seccion', 'instrumento', 'grado'];
-            keys.forEach(k => {
+            ['proceso', 'seccion', 'instrumento', 'grado'].forEach(k => {
                 const select = document.getElementById(`add-${k}`);
-                select.innerHTML = session.config[k].map(opt => `<option value="${opt}">${opt.toUpperCase()}</option>`).join('');
+                if(session.config[k]) {
+                    select.innerHTML = session.config[k].map(opt => `<option value="${opt}">${opt.toUpperCase()}</option>`).join('');
+                }
             });
         }
 
         function renderProcessButtons() {
             const box = document.getElementById('process-buttons');
-            box.innerHTML = session.config.proceso.map(p => `
-                <button onclick="initAttendance('${p}')" class="w-full p-8 bg-white rounded-[30px] shadow-md font-black text-left border-r-8 border-blue-900 uppercase italic">${p}</button>
-            `).join('');
+            if(session.config.proceso) {
+                box.innerHTML = session.config.proceso.map(p => `
+                    <button onclick="initAttendance('${p}')" class="w-full p-8 bg-white rounded-[30px] shadow-md font-black text-left border-r-8 border-blue-900 uppercase italic">${p}</button>
+                `).join('');
+            }
         }
 
         function nav(id) {
@@ -189,7 +193,7 @@
             session.date = document.getElementById('event-date').value;
             session.type = document.getElementById('event-type').value;
             session.act = (session.type === 'Ensayo' ? 'ENSAYO' : document.getElementById('event-desc').value).toUpperCase();
-            if(!session.act) return alert("ESCRIBA EL NOMBRE DE LA PRESENTACIÓN");
+            if(!session.act) return alert("COMPLETE EL NOMBRE DE LA ACTIVIDAD");
             document.getElementById('info-header').innerText = `${proc} • ${session.act}`;
             nav('screen-list');
         }
@@ -197,9 +201,11 @@
         function renderTabs() {
             const tabBox = document.getElementById('family-tabs');
             let html = `<button onclick="renderList('TODOS')" id="tab-TODOS" class="tab-btn active-tab pb-2">TODOS</button>`;
-            session.config.seccion.forEach(s => {
-                html += `<button onclick="renderList('${s}')" id="tab-${s.replace(/\s/g,'')}" class="tab-btn text-slate-300 pb-2">${s.toUpperCase()}</button>`;
-            });
+            if(session.config.seccion) {
+                session.config.seccion.forEach(s => {
+                    html += `<button onclick="renderList('${s}')" id="tab-${s.replace(/\s/g,'')}" class="tab-btn text-slate-300 pb-2">${s.toUpperCase()}</button>`;
+                });
+            }
             tabBox.innerHTML = html;
             renderList('TODOS');
         }
@@ -207,7 +213,7 @@
         function renderList(secc) {
             document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active-tab'); b.classList.add('text-slate-300'); });
             const box = document.getElementById('musicos-box'); box.innerHTML = "";
-            const filtered = session.masterList.filter(m => m.proceso === session.process && (secc === 'TODOS' || m.seccion === secc));
+            const filtered = session.masterList.filter(m => String(m.proceso).trim() === String(session.process).trim() && (secc === 'TODOS' || m.seccion === secc));
             
             filtered.forEach(m => {
                 const fullNom = `${m.nombres} ${m.apellidos}`.toUpperCase();
@@ -246,22 +252,22 @@
                 instrumento: document.getElementById('add-instrumento').value,
                 grado: document.getElementById('add-grado').value
             };
-            if(!d.nombres || !d.apellidos) return alert("FALTAN DATOS");
-            toggleLoader(true, "AGREGANDO...");
+            if(!d.nombres || !d.apellidos) return alert("NOMBRES Y APELLIDOS SON OBLIGATORIOS");
+            toggleLoader(true, "GUARDANDO ESTUDIANTE...");
             await fetch(MOTOR_URL, { method: 'POST', body: JSON.stringify({ action: 'addEstudiante', sheetId: session.sheetId, datos: d })});
-            alert("ESTUDIANTE AGREGADO");
+            alert("✅ ESTUDIANTE AGREGADO A GENERAL");
             await fetchFullData(); nav('screen-menu');
             toggleLoader(false);
         }
 
         async function finalize() {
-            if(Object.keys(record).length === 0) return alert("MARQUE ASISTENCIA");
-            toggleLoader(true, "GUARDANDO...");
+            if(Object.keys(record).length === 0) return alert("NO HAY ASISTENCIA MARCADA");
+            toggleLoader(true, "SINCRONIZANDO ASISTENCIA...");
             const data = Object.entries(record).map(([nom, est]) => ({
                 fecha: session.date, tipo_actividad: session.type, nombre_actividad: session.act, proceso: session.process, musico: nom, estado: est
             }));
             await fetch(MOTOR_URL, { method: 'POST', body: JSON.stringify({ action: 'saveAsistencia', sheetId: session.sheetId, asistencia: data })});
-            alert("LOG ACTUALIZADO");
+            alert("✅ REPORTE GUARDADO CON ÉXITO");
             record = {}; nav('screen-menu');
             toggleLoader(false);
         }
