@@ -110,8 +110,11 @@
         <button onclick="nav('screen-menu')" class="text-slate-400 font-black mb-6 text-[11px] uppercase tracking-widest">← Volver</button>
         <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 space-y-4">
             <h2 class="text-lg font-black uppercase">Nuevo Integrante</h2>
-            <input type="text" id="add-nombres" placeholder="NOMBRES" class="w-full p-4 bg-slate-50 rounded-lg text-sm font-bold uppercase">
-            <input type="text" id="add-apellidos" placeholder="APELLIDOS" class="w-full p-4 bg-slate-50 rounded-lg text-sm font-bold uppercase">
+            
+            <input type="text" id="add-nombres" placeholder="Nombres" class="w-full p-4 bg-slate-50 rounded-lg text-sm font-bold">
+            <input type="text" id="add-apellidos" placeholder="Apellidos" class="w-full p-4 bg-slate-50 rounded-lg text-sm font-bold">
+            <input type="text" id="add-eps" placeholder="EPS / Servicio de Salud" class="w-full p-4 bg-slate-50 rounded-lg text-sm font-bold">
+
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-[9px] font-black text-slate-400 mb-1 uppercase">Documento</label>
@@ -122,9 +125,11 @@
                     <input type="date" id="add-fecha_nacimiento" class="w-full p-3 bg-slate-50 rounded-lg text-sm font-bold">
                 </div>
             </div>
+
             <select id="add-proceso" class="w-full p-3 bg-slate-50 rounded-lg text-[11px] font-bold uppercase"></select>
             <select id="add-instrumento" class="w-full p-3 bg-slate-50 rounded-lg text-[11px] font-bold uppercase"></select>
             <select id="add-grado" class="w-full p-3 bg-slate-50 rounded-lg text-[11px] font-bold uppercase"></select>
+            
             <button onclick="saveNewStudent()" class="w-full bg-slate-900 text-white p-4 rounded-xl font-bold uppercase text-xs">Guardar Registro</button>
         </div>
     </div>
@@ -252,7 +257,16 @@
         }
 
         async function saveNewStudent() {
-            const d = { nombres: document.getElementById('add-nombres').value, apellidos: document.getElementById('add-apellidos').value, documento: document.getElementById('add-documento').value, fecha_nacimiento: document.getElementById('add-fecha_nacimiento').value, proceso: document.getElementById('add-proceso').value, instrumento: document.getElementById('add-instrumento').value, grado: document.getElementById('add-grado').value };
+            const d = { 
+                nombres: document.getElementById('add-nombres').value, 
+                apellidos: document.getElementById('add-apellidos').value, 
+                eps: document.getElementById('add-eps').value,
+                documento: document.getElementById('add-documento').value, 
+                fecha_nacimiento: document.getElementById('add-fecha_nacimiento').value, 
+                proceso: document.getElementById('add-proceso').value, 
+                instrumento: document.getElementById('add-instrumento').value, 
+                grado: document.getElementById('add-grado').value 
+            };
             if(!d.nombres || !d.apellidos) return alert("Completa nombres y apellidos");
             loader(true, "Registrando...");
             try {
@@ -260,6 +274,7 @@
                 alert("Registro Exitoso");
                 document.getElementById('add-nombres').value = "";
                 document.getElementById('add-apellidos').value = "";
+                document.getElementById('add-eps').value = "";
                 document.getElementById('add-documento').value = "";
                 document.getElementById('add-fecha_nacimiento').value = "";
                 document.getElementById('add-proceso').selectedIndex = 0;
