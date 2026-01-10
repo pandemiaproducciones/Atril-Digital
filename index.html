@@ -93,13 +93,13 @@
     <div id="screen-activity" class="hidden p-6 max-w-md mx-auto">
         <button onclick="nav('screen-menu')" class="text-slate-400 font-black mb-6 text-[10px] uppercase tracking-widest">← Volver</button>
         <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 space-y-6">
-            <h2 class="text-lg font-black text-slate-900 uppercase">Configurar Sesión</h2>
+            <h2 class="text-lg font-black text-slate-900 uppercase">Datos de la Jornada</h2>
             <div>
-                <label class="block text-[9px] font-black text-slate-400 mb-2 uppercase tracking-widest">Fecha de Actividad</label>
+                <label class="block text-[9px] font-black text-slate-400 mb-2 uppercase tracking-widest">Fecha (Hoy)</label>
                 <input type="date" id="event-date" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none text-sm">
             </div>
             <div>
-                <label class="block text-[9px] font-black text-slate-400 mb-2 uppercase tracking-widest">Modalidad</label>
+                <label class="block text-[9px] font-black text-slate-400 mb-2 uppercase tracking-widest">Tipo de Encuentro</label>
                 <select id="event-type" onchange="toggleEventDesc()" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-sm">
                     <option value="Ensayo">ENSAYO</option>
                     <option value="Presentación">PRESENTACIÓN</option>
@@ -108,7 +108,7 @@
             <div id="event-desc-box" class="hidden">
                 <input type="text" id="event-desc" placeholder="NOMBRE DEL EVENTO" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-sm uppercase">
             </div>
-            <button onclick="nav('screen-process')" class="w-full bg-slate-900 text-white p-4 rounded-xl font-bold uppercase text-xs tracking-widest">Continuar</button>
+            <button onclick="nav('screen-process')" class="w-full bg-slate-900 text-white p-4 rounded-xl font-bold uppercase text-xs tracking-widest">Ir a Lista</button>
         </div>
     </div>
 
@@ -156,7 +156,7 @@
             const u = document.getElementById('user-input').value.trim();
             const p = document.getElementById('pass-input').value.trim();
             if(!u || !p) return;
-            toggleLoader(true, "Iniciando Sesión...");
+            toggleLoader(true, "Iniciando Sesión..."); // Texto solicitado
             try {
                 const resp = await fetch(`${MOTOR_URL}?action=login&user=${encodeURIComponent(u)}&pass=${encodeURIComponent(p)}`);
                 const data = await resp.json();
@@ -205,6 +205,7 @@
         function nav(id) {
             document.querySelectorAll('body > div').forEach(d => d.id !== 'loader' && d.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
+            // Fecha actual por defecto
             if(id === 'screen-activity') document.getElementById('event-date').value = new Date().toISOString().split('T')[0];
             if(id === 'screen-list') renderList('TODOS');
         }
@@ -288,14 +289,13 @@
 
             if(!d.nombres || !d.apellidos || !d.proceso) return alert("Faltan datos obligatorios");
             
-            toggleLoader(true, "Registrando...");
+            toggleLoader(true, "Registrando Estudiante...");
             try {
                 await fetch(MOTOR_URL, { method: 'POST', body: JSON.stringify({ action: 'addEstudiante', sheetId: session.sheetId, datos: d })});
                 alert("Estudiante ingresado correctamente");
                 
-                // LIMPIEZA Y ACTUALIZACIÓN AUTOMÁTICA
                 ['nombres','apellidos','documento','fecha_nacimiento','eps'].forEach(id => document.getElementById(`add-${id}`).value = "");
-                await fetchFullData(); // Sincroniza la lista de nuevo
+                await fetchFullData(); // Sincroniza la lista de inmediato
                 
                 nav('screen-menu');
             } catch(e) { alert("Error al guardar"); }
@@ -304,7 +304,7 @@
 
         async function finalize() {
             if(Object.keys(record).length === 0) return alert("No hay datos marcados");
-            toggleLoader(true, "Guardando...");
+            toggleLoader(true, "Guardando Reporte...");
             const data = Object.entries(record).map(([nom, est]) => ({
                 fecha: session.date, tipo_actividad: session.type, nombre_actividad: session.act, proceso: session.process, musico: nom, estado: est
             }));
