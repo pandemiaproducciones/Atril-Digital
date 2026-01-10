@@ -2,27 +2,28 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ATRIL DIGITAL</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
-        body { font-family: 'Montserrat', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Montserrat', sans-serif; background-color: #f8fafc; overflow-x: hidden; }
         .hidden { display: none; }
         .loader { border-top-color: #0f172a; animation: spinner 1.5s linear infinite; }
         @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .active-tab { border-bottom: 3px solid #0f172a; color: #0f172a; font-weight: 900; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         input, select { border: 1px solid #e2e8f0 !important; width: 100% !important; box-sizing: border-box !important; }
+        input:focus, select:focus { border-color: #0f172a !important; ring: 1px solid #0f172a; }
     </style>
 </head>
 <body class="text-slate-800">
 
     <div id="loader" class="hidden fixed inset-0 bg-white/95 z-50 flex flex-col items-center justify-center">
         <div class="loader ease-linear rounded-full border-4 border-t-4 border-slate-200 h-12 w-12 mb-4"></div>
-        <p id="loader-text" class="text-slate-900 font-bold uppercase text-[11px] tracking-widest">Sincronizando...</p>
+        <p id="loader-text" class="text-slate-900 font-bold uppercase text-[11px] tracking-widest">Cargando...</p>
     </div>
 
     <div id="screen-login" class="flex items-center justify-center min-h-screen p-4">
@@ -33,9 +34,9 @@
             <div class="space-y-3">
                 <input type="text" id="user-input" placeholder="USUARIO" class="p-4 bg-slate-50 rounded-xl outline-none font-bold text-sm">
                 <input type="password" id="pass-input" placeholder="CONTRASEÑA" class="p-4 bg-slate-50 rounded-xl outline-none text-2xl tracking-widest">
-                <button onclick="loginProcess()" class="w-full bg-slate-900 text-white p-4 rounded-xl font-bold uppercase text-sm tracking-widest">Ingresar</button>
+                <button onclick="loginProcess()" class="w-full bg-slate-900 text-white p-4 rounded-xl font-bold uppercase text-sm tracking-widest hover:bg-black transition-all">Ingresar</button>
             </div>
-            <p id="login-error" class="text-red-600 text-[11px] mt-6 hidden font-bold uppercase">Credenciales incorrectas</p>
+            <p id="login-error" class="text-red-600 text-[11px] mt-6 hidden font-bold uppercase tracking-wide">Credenciales incorrectas</p>
         </div>
     </div>
 
@@ -45,28 +46,29 @@
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">BANDA SINFÓNICA</p>
                 <h2 id="display-band-name" class="text-xl font-black text-slate-900 uppercase">---</h2>
             </div>
-            <button onclick="logout()" class="border-2 border-red-500 text-red-500 px-4 py-2 rounded-xl text-[10px] font-black uppercase">Salir</button>
+            <button onclick="logout()" class="border-2 border-red-500 text-red-500 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest">Salir</button>
         </div>
         <button onclick="nav('screen-activity')" class="w-full bg-white p-7 rounded-2xl shadow-sm border border-slate-100 flex justify-between items-center text-left">
-            <span class="font-black text-slate-700 text-sm uppercase">Asistencia</span>
+            <span class="font-black text-slate-700 text-sm uppercase tracking-wider">Asistencia</span>
             <div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center">📋</div>
         </button>
         <button onclick="nav('screen-add-student')" class="w-full bg-white p-7 rounded-2xl shadow-sm border border-slate-100 flex justify-between items-center text-left">
-            <span class="font-black text-slate-700 text-sm uppercase">Ingresar Estudiantes</span>
+            <span class="font-black text-slate-700 text-sm uppercase tracking-wider">Ingresar Estudiantes</span>
             <div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center">👤</div>
         </button>
+        <div class="pt-20 flex justify-center"><img src="https://github.com/pandemiaproducciones/Atril-Digital/blob/main/logo.png?raw=true" class="w-32 opacity-20"></div>
     </div>
 
     <div id="screen-activity" class="hidden p-6 max-w-md mx-auto">
-        <button onclick="nav('screen-menu')" class="text-slate-400 font-black mb-6 text-[11px] uppercase">← Volver</button>
+        <button onclick="nav('screen-menu')" class="text-slate-400 font-black mb-6 text-[11px] uppercase tracking-widest">← Volver</button>
         <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 space-y-6">
             <h2 class="text-lg font-black text-slate-900 uppercase">Datos de la Jornada</h2>
             <div>
-                <label class="block text-[10px] font-black text-slate-400 mb-2 uppercase">Fecha (Hoy)</label>
+                <label class="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">Fecha (Hoy)</label>
                 <input type="date" id="event-date" class="p-4 bg-slate-50 rounded-xl font-bold text-sm">
             </div>
             <div>
-                <label class="block text-[10px] font-black text-slate-400 mb-2 uppercase">Tipo de Encuentro</label>
+                <label class="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">Tipo de Encuentro</label>
                 <select id="event-type" onchange="toggleEventDesc()" class="p-4 bg-slate-50 rounded-xl font-bold text-sm">
                     <option value="Ensayo">ENSAYO</option>
                     <option value="Presentación">PRESENTACIÓN</option>
@@ -75,24 +77,24 @@
             <div id="event-desc-box" class="hidden">
                 <input type="text" id="event-desc" placeholder="NOMBRE DEL EVENTO" class="p-4 bg-slate-50 rounded-xl font-bold text-sm uppercase">
             </div>
-            <button onclick="nav('screen-process')" class="w-full bg-slate-900 text-white p-4 rounded-xl font-bold uppercase text-xs">Ir a Lista</button>
+            <button onclick="nav('screen-process')" class="w-full bg-slate-900 text-white p-4 rounded-xl font-bold uppercase text-xs tracking-widest">Siguiente</button>
         </div>
     </div>
 
     <div id="screen-process" class="hidden p-6 max-w-md mx-auto space-y-4">
-        <button onclick="nav('screen-activity')" class="text-slate-400 font-black mb-4 text-[11px] uppercase">← Volver</button>
-        <h2 class="text-sm font-black text-slate-400 uppercase text-center mb-6">Seleccione Proceso</h2>
+        <button onclick="nav('screen-activity')" class="text-slate-400 font-black mb-4 text-[11px] uppercase tracking-widest">← Volver</button>
         <div id="process-buttons" class="space-y-3"></div>
     </div>
 
     <div id="screen-list" class="hidden min-h-screen pb-44">
         <div class="bg-white p-6 sticky top-0 z-20 shadow-sm border-b border-slate-100">
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex justify-between items-center mb-4">
                 <button onclick="nav('screen-process')" class="text-slate-400 font-black text-[11px] uppercase">← Atrás</button>
-                <span id="counter" class="text-[10px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-black uppercase">0 Marcados</span>
+                <span id="counter" class="text-[10px] bg-slate-100 px-3 py-1 rounded-full font-black uppercase">0 Marcados</span>
             </div>
-            <input type="text" id="search" onkeyup="filterList()" placeholder="Buscar estudiante..." class="p-3 bg-slate-50 rounded-xl font-bold text-xs mb-5">
-            <div id="family-tabs" class="flex gap-6 overflow-x-auto no-scrollbar text-[13px] font-black uppercase border-t border-slate-50 pt-4">
+            <p id="info-header" class="font-black text-[11px] text-slate-900 uppercase mb-4"></p>
+            <input type="text" id="search" onkeyup="filterList()" placeholder="Buscar..." class="p-3 bg-slate-50 rounded-xl text-xs mb-4">
+            <div id="family-tabs" class="flex gap-4 overflow-x-auto no-scrollbar text-[10px] font-black uppercase">
                 <button onclick="renderList('TODOS')" id="tab-TODOS" class="tab-btn active-tab pb-2">Todos</button>
                 <button onclick="renderList('Maderas')" id="tab-Maderas" class="tab-btn text-slate-300 pb-2">Maderas</button>
                 <button onclick="renderList('Bronces')" id="tab-Bronces" class="tab-btn text-slate-300 pb-2">Bronces</button>
@@ -100,168 +102,174 @@
                 <button onclick="renderList('Percusion')" id="tab-Percusion" class="tab-btn text-slate-300 pb-2">Percusión</button>
             </div>
         </div>
-        <div id="musicos-box" class="p-6 space-y-3"></div>
-        <div class="fixed bottom-0 bg-white/90 backdrop-blur-md w-full p-6 border-t border-slate-100 flex gap-3">
-            <button onclick="finalize()" class="flex-[2] bg-slate-900 text-white p-4 rounded-xl font-bold uppercase text-[11px]">Guardar</button>
-            <button onclick="whatsappReport()" class="flex-1 bg-slate-100 text-slate-600 p-4 rounded-xl font-bold uppercase text-[11px]">WhatsApp</button>
+        <div id="musicos-box" class="p-4 space-y-3"></div>
+        <div class="fixed bottom-0 bg-white/90 backdrop-blur-md w-full p-4 border-t flex gap-2 shadow-2xl">
+            <button onclick="finalize()" class="flex-grow bg-slate-900 text-white p-4 rounded-xl font-bold uppercase text-[10px]">Guardar</button>
+            <button onclick="prepararPDF()" class="bg-slate-100 p-4 rounded-xl font-bold uppercase text-[10px]">PDF</button>
+            <button onclick="whatsappReport()" class="bg-slate-100 p-4 rounded-xl font-bold uppercase text-[10px]">WA</button>
         </div>
     </div>
 
     <div id="screen-add-student" class="hidden p-6 max-w-md mx-auto">
-        <button onclick="nav('screen-menu')" class="text-slate-400 font-black mb-6 text-[11px] uppercase">← Volver</button>
-        <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 space-y-4">
-            <h2 class="text-lg font-black text-slate-900 uppercase">Nuevo Integrante</h2>
-            <input type="text" id="add-nombres" placeholder="NOMBRES" class="p-4 bg-slate-50 rounded-lg text-sm">
-            <input type="text" id="add-apellidos" placeholder="APELLIDOS" class="p-4 bg-slate-50 rounded-lg text-sm">
-            <select id="add-proceso" class="p-3 bg-slate-50 rounded-lg font-bold text-[11px]"></select>
-            <select id="add-instrumento" class="p-3 bg-slate-50 rounded-lg font-bold text-[11px]"></select>
+        <button onclick="nav('screen-menu')" class="text-slate-400 font-black mb-6 text-[11px] uppercase tracking-widest">← Volver</button>
+        <div class="bg-white p-6 rounded-3xl shadow-lg border border-slate-100 space-y-4">
+            <h2 class="text-lg font-black text-slate-900 uppercase">Nuevo Estudiante</h2>
+            <input type="text" id="add-nombres" placeholder="NOMBRES" class="p-3 bg-slate-50 rounded-lg text-sm">
+            <input type="text" id="add-apellidos" placeholder="APELLIDOS" class="p-3 bg-slate-50 rounded-lg text-sm">
+            <input type="number" id="add-documento" placeholder="DOCUMENTO" class="p-3 bg-slate-50 rounded-lg text-sm">
+            <input type="date" id="add-fecha_nacimiento" class="p-3 bg-slate-50 rounded-lg text-sm">
+            <input type="text" id="add-eps" placeholder="EPS" class="p-3 bg-slate-50 rounded-lg text-sm">
+            <select id="add-proceso" class="p-3 bg-slate-50 rounded-lg text-sm"></select>
+            <select id="add-instrumento" class="p-3 bg-slate-50 rounded-lg text-sm"></select>
+            <select id="add-grado" class="p-3 bg-slate-50 rounded-lg text-sm"></select>
             <button onclick="saveNewStudent()" class="w-full bg-slate-900 text-white p-4 rounded-xl font-bold uppercase text-xs">Guardar</button>
         </div>
     </div>
 
     <script>
         const MOTOR_URL = "https://script.google.com/macros/s/AKfycby9Uhz781irc-n9TbVAmbCu2Bh1QVZU1w0xnACPAa64_17AGbCrTYviTu3IacHACYpY2w/exec";
-        let session = { user: "", banda: "", sheetId: "", date: "", process: "", masterList: [], config: {} };
-        let record = {};
+        let session = JSON.parse(localStorage.getItem('atril_session')) || { user: "", banda: "", sheetId: "", date: "", type: "", act: "", process: "", masterList: [], config: {}, currentScreen: "screen-login" };
+        let record = JSON.parse(localStorage.getItem('atril_record')) || {};
 
         window.onload = () => {
-            const saved = localStorage.getItem('atril_session');
-            if (saved) {
-                session = JSON.parse(saved);
+            if(session.user) {
                 document.getElementById('display-band-name').innerText = session.banda;
-                fetchFullData();
-                nav('screen-menu');
+                populateSelects();
+                renderProcessButtons();
+                nav(session.currentScreen, true);
             }
         };
 
-        function logout() {
-            localStorage.removeItem('atril_session');
-            location.reload();
+        function saveLocal() {
+            localStorage.setItem('atril_session', JSON.stringify(session));
+            localStorage.setItem('atril_record', JSON.stringify(record));
+        }
+
+        function nav(id, skipSave = false) {
+            document.querySelectorAll('body > div').forEach(d => d.id !== 'loader' && d.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            session.currentScreen = id;
+            if(id === 'screen-activity') setTodayDate();
+            if(id === 'screen-list') renderList('TODOS');
+            if(!skipSave) saveLocal();
         }
 
         function setTodayDate() {
-            const now = new Date();
-            document.getElementById('event-date').value = now.toISOString().split('T')[0];
+            const d = new Date();
+            const fecha = d.toISOString().split('T')[0];
+            document.getElementById('event-date').value = fecha;
+            session.date = fecha;
         }
 
         async function loginProcess() {
             const u = document.getElementById('user-input').value.trim();
             const p = document.getElementById('pass-input').value.trim();
-            toggleLoader(true, "Iniciando...");
+            if(!u || !p) return;
+            toggleLoader(true, "Verificando...");
             try {
-                const resp = await fetch(`${MOTOR_URL}?action=login&user=${encodeURIComponent(u)}&pass=${encodeURIComponent(p)}`);
-                const data = await resp.json();
-                if(data.success) {
-                    session.user = u; session.banda = data.banda; session.sheetId = data.sheetId;
-                    localStorage.setItem('atril_session', JSON.stringify(session));
+                const r = await fetch(`${MOTOR_URL}?action=login&user=${u}&pass=${p}`);
+                const d = await r.json();
+                if(d.success) {
+                    session.user = u; session.banda = d.banda; session.sheetId = d.sheetId;
                     document.getElementById('display-band-name').innerText = session.banda;
                     await fetchFullData();
                     nav('screen-menu');
                 } else { document.getElementById('login-error').classList.remove('hidden'); }
-            } catch (e) { alert("Error de conexión"); }
+            } catch (e) { alert("Error de red"); }
             toggleLoader(false);
         }
 
         async function fetchFullData() {
-            const res = await fetch(`${MOTOR_URL}?action=getDataInicial&sheetId=${encodeURIComponent(session.sheetId)}`);
-            const data = await res.json();
-            session.masterList = data.integrantes;
-            session.config = data.config;
-            renderProcessButtons();
-            
-            // Llenar selects de agregar estudiante
-            const pSel = document.getElementById('add-proceso');
-            const iSel = document.getElementById('add-instrumento');
-            if(session.config.proceso) pSel.innerHTML = session.config.proceso.map(p => `<option value="${p}">${p}</option>`).join('');
-            if(session.config.instrumento) iSel.innerHTML = session.config.instrumento.map(i => `<option value="${i}">${i}</option>`).join('');
-        }
-
-        function nav(id) {
-            document.querySelectorAll('body > div').forEach(d => d.id !== 'loader' && d.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-            if(id === 'screen-activity') setTodayDate();
+            const r = await fetch(`${MOTOR_URL}?action=getDataInicial&sheetId=${session.sheetId}`);
+            const d = await r.json();
+            session.masterList = d.integrantes; session.config = d.config;
+            populateSelects(); renderProcessButtons(); saveLocal();
         }
 
         function renderProcessButtons() {
-            const box = document.getElementById('process-buttons');
+            const b = document.getElementById('process-buttons');
             if(session.config.proceso) {
-                box.innerHTML = session.config.proceso.map(p => `
-                    <button onclick="initAttendance('${p}')" class="w-full p-6 bg-white rounded-2xl shadow-sm border border-slate-100 font-bold text-left uppercase text-xs">${p}</button>
-                `).join('');
+                b.innerHTML = `<h2 class="text-sm font-black text-slate-400 uppercase text-center mb-6 tracking-widest">Seleccione Proceso</h2>` + 
+                session.config.proceso.map(p => `<button onclick="initAttendance('${p}')" class="w-full p-6 bg-white rounded-2xl shadow-sm border border-slate-100 font-bold text-left uppercase text-xs tracking-widest">${p}</button>`).join('');
             }
         }
 
-        function initAttendance(proc) {
-            session.process = proc;
+        function initAttendance(p) {
+            session.process = p;
             session.date = document.getElementById('event-date').value;
+            session.type = document.getElementById('event-type').value;
+            session.act = (session.type === 'Ensayo' ? 'ENSAYO' : document.getElementById('event-desc').value).toUpperCase();
+            document.getElementById('info-header').innerText = `${session.process} • ${session.act}`;
             nav('screen-list');
-            renderList('TODOS');
         }
 
         function renderList(secc) {
             document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active-tab'); b.classList.add('text-slate-300'); });
             document.getElementById(`tab-${secc}`).classList.add('active-tab');
+            document.getElementById(`tab-${secc}`).classList.remove('text-slate-300');
             
             const box = document.getElementById('musicos-box'); box.innerHTML = "";
             const filtered = session.masterList.filter(m => m.proceso === session.process && (secc === 'TODOS' || m.seccion === secc));
             
             filtered.forEach(m => {
-                const fullNom = `${m.nombres} ${m.apellidos}`.toUpperCase();
-                const sel = record[fullNom] || '';
-                const card = document.createElement('div');
-                card.className = "bg-white p-4 rounded-2xl border border-slate-100";
-                card.innerHTML = `
-                    <p class="font-bold text-[13px] mb-3 uppercase">${fullNom}</p>
-                    <div class="grid grid-cols-4 gap-1">
+                const n = `${m.nombres} ${m.apellidos}`.toUpperCase();
+                const sel = record[n] || '';
+                const div = document.createElement('div');
+                div.className = "bg-white p-3 rounded-2xl shadow-sm border border-slate-100";
+                div.innerHTML = `
+                    <p class="font-bold text-[12px] uppercase mb-2 leading-tight">${n}</p>
+                    <div class="flex gap-1">
                         ${['PRESENTE','AUSENTE','RETARDO','EXCUSA'].map(s => `
-                            <button onclick="mark('${fullNom}','${s}', this)" class="py-3 px-0 rounded-lg border font-black text-[8px] transition-all ${sel === s ? getCol(s) : 'bg-slate-50 text-slate-400 border-slate-50'}">
+                            <button onclick="mark('${n}','${s}', this)" class="flex-1 py-3 rounded-lg border font-bold text-[9px] uppercase transition-all ${sel === s ? getCol(s) : 'bg-slate-50 text-slate-400 border-slate-50'}">
                                 ${s}
                             </button>`).join('')}
                     </div>`;
-                box.appendChild(card);
+                box.appendChild(div);
             });
+            document.getElementById('counter').innerText = `${Object.keys(record).length} Marcados`;
         }
 
         function getCol(s) {
-            return { PRESENTE:'bg-slate-900 text-white', AUSENTE:'bg-red-500 text-white', RETARDO:'bg-amber-500 text-white', EXCUSA:'bg-blue-500 text-white' }[s];
+            return { PRESENTE:'bg-slate-900 text-white border-slate-900', AUSENTE:'bg-red-50 text-red-600 border-red-100', RETARDO:'bg-amber-50 text-amber-600 border-amber-100', EXCUSA:'bg-blue-50 text-blue-600 border-blue-100' }[s];
         }
 
-        function mark(nom, est, btn) {
-            record[nom] = est;
-            document.getElementById('counter').innerText = `${Object.keys(record).length} Marcados`;
-            btn.parentElement.querySelectorAll('button').forEach(b => b.className = "py-3 px-0 rounded-lg border font-black text-[8px] bg-slate-50 text-slate-400 border-slate-50");
-            btn.className = `py-3 px-0 rounded-lg border font-black text-[8px] ${getCol(est)}`;
+        function mark(n, s, btn) {
+            record[n] = s;
+            renderList(document.querySelector('.tab-btn.active-tab').id.replace('tab-',''));
+            saveLocal();
         }
 
         function whatsappReport() {
-            const entries = Object.entries(record);
-            const ausentes = entries.filter(([n, e]) => e === 'AUSENTE');
-            const retardos = entries.filter(([n, e]) => e === 'RETARDO');
-            let txt = `📢 *REPORTE: ${session.banda.toUpperCase()}*\n🎼 *PROCESO:* ${session.process}\n📅 *FECHA:* ${session.date}\n\n`;
-            txt += `❌ *AUSENTES:*\n${ausentes.map(([n]) => `• ${n}`).join('\n') || '_Ninguno_'}\n\n`;
-            txt += `⏳ *RETARDOS:*\n${retardos.map(([n]) => `• ${n}`).join('\n') || '_Ninguno_'}`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`);
+            const r = Object.entries(record);
+            const ret = r.filter(x => x[1] === 'RETARDO').map(x => x[0]);
+            const aus = r.filter(x => x[1] === 'AUSENTE').map(x => x[0]);
+            let t = `📢 *REPORTE BANDA ${session.banda.toUpperCase()}*\n🎼 *PROCESO:* ${session.process}\n📅 ${session.date}\n\n`;
+            t += `⏱️ *RETARDOS:*\n${ret.length ? ret.map(x => `• ${x}`).join('\n') : '_Ninguno_'}\n\n`;
+            t += `❌ *AUSENCIAS:*\n${aus.length ? aus.map(x => `• ${x}`).join('\n') : '_Ninguno_'}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(t)}`);
         }
 
         async function finalize() {
+            if(!Object.keys(record).length) return alert("Lista vacía");
             toggleLoader(true, "Guardando...");
-            const data = Object.entries(record).map(([nom, est]) => ({
-                fecha: session.date, proceso: session.process, musico: nom, estado: est
-            }));
+            const data = Object.entries(record).map(([n, e]) => ({ fecha: session.date, tipo_actividad: session.type, nombre_actividad: session.act, proceso: session.process, musico: n, estado: e }));
             await fetch(MOTOR_URL, { method: 'POST', body: JSON.stringify({ action: 'saveAsistencia', sheetId: session.sheetId, asistencia: data })});
             alert("Guardado exitoso");
-            record = {}; nav('screen-menu');
+            record = {}; localStorage.removeItem('atril_record');
+            nav('screen-menu');
             toggleLoader(false);
         }
 
-        function toggleLoader(v, text) {
-            document.getElementById('loader-text').innerText = text;
-            document.getElementById('loader').classList.toggle('hidden', !v);
-        }
-
-        function filterList() {
-            const q = document.getElementById('search').value.toLowerCase();
-            document.querySelectorAll('.bg-white.p-4.rounded-2xl').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? 'block' : 'none');
+        function logout() { localStorage.clear(); location.reload(); }
+        function toggleLoader(v, t) { document.getElementById('loader-text').innerText = t; document.getElementById('loader').classList.toggle('hidden', !v); }
+        function toggleEventDesc() { document.getElementById('event-desc-box').classList.toggle('hidden', document.getElementById('event-type').value !== 'Presentación'); }
+        function filterList() { const q = document.getElementById('search').value.toLowerCase(); document.querySelectorAll('.bg-white.p-3').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? 'block' : 'none'); }
+        function populateSelects() { 
+            const k = {proceso: 'PROCESO', instrumento: 'INSTRUMENTO', grado: 'GRADO'};
+            Object.keys(k).forEach(key => {
+                const s = document.getElementById(`add-${key}`);
+                if(session.config[key]) s.innerHTML = session.config[key].map(opt => `<option value="${opt}">${opt}</option>`).join('');
+            });
         }
     </script>
 </body>
