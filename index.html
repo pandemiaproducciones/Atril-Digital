@@ -29,7 +29,7 @@
             <h1 class="text-2xl font-black mb-1 uppercase tracking-tighter">ATRIL DIGITAL</h1>
             <p class="text-slate-400 text-[10px] mb-8 font-bold tracking-widest">GESTIÓN DE BANDAS</p>
             <div class="space-y-3">
-                <input type="text" id="user-input" placeholder="USUARIO" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-sm">
+                <input type="text" id="user-input" placeholder="USUARIO" class="w-full p-4 bg-slate-50 rounded-xl font-bold text-sm uppercase">
                 <input type="password" id="pass-input" placeholder="CONTRASEÑA" class="w-full p-4 bg-slate-50 rounded-xl text-2xl tracking-widest">
                 <button onclick="loginProcess()" class="w-full bg-slate-900 text-white p-4 rounded-xl font-bold uppercase text-sm">Ingresar</button>
             </div>
@@ -89,7 +89,7 @@
                 <span id="counter" class="text-[10px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-black uppercase">0 Marcados</span>
             </div>
             <p id="info-header" class="font-black text-[12px] uppercase mb-4"></p>
-            <input type="text" id="search" onkeyup="filterList()" placeholder="Buscar estudiante..." class="w-full p-3 bg-slate-50 rounded-xl text-xs font-bold mb-4">
+            <input type="text" id="search" onkeyup="filterList()" placeholder="Buscar estudiante..." class="w-full p-3 bg-slate-50 rounded-xl text-xs font-bold mb-4 uppercase">
             <div id="family-tabs" class="flex gap-4 overflow-x-auto no-scrollbar text-[11px] font-black uppercase border-t pt-4">
                 <button onclick="renderList('TODOS')" id="tab-TODOS" class="tab-btn active-tab pb-2">Todos</button>
                 <button onclick="renderList('Maderas')" id="tab-Maderas" class="tab-btn text-slate-300 pb-2">Maderas</button>
@@ -100,7 +100,7 @@
         </div>
         <div id="musicos-box" class="p-6 space-y-3"></div>
         <div class="fixed bottom-0 bg-white/90 backdrop-blur-md w-full p-6 border-t shadow-2xl flex gap-3">
-            <button onclick="finalize()" class="flex-[2] bg-slate-900 text-white p-4 rounded-xl font-bold uppercase text-[11px]">Guardar Reporte</button>
+            <button onclick="finalize()" class="flex-[2] bg-slate-900 text-white p-4 rounded-xl font-bold uppercase text-[11px]">Guardar</button>
             <button onclick="whatsappReport()" class="flex-1 bg-slate-100 text-slate-600 p-4 rounded-xl font-bold uppercase text-[11px]">WA</button>
         </div>
     </div>
@@ -109,34 +109,43 @@
         <button onclick="nav('screen-menu')" class="text-slate-400 font-black mb-6 text-[11px] uppercase tracking-widest">← Volver</button>
         <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 space-y-4">
             <h2 class="text-lg font-black uppercase">Nuevo Integrante</h2>
-            <input type="text" id="add-nombres" placeholder="NOMBRES" class="w-full p-4 bg-slate-50 rounded-lg text-sm font-bold">
-            <input type="text" id="add-apellidos" placeholder="APELLIDOS" class="w-full p-4 bg-slate-50 rounded-lg text-sm font-bold">
+            <input type="text" id="add-nombres" placeholder="NOMBRES" class="w-full p-4 bg-slate-50 rounded-lg text-sm font-bold uppercase">
+            <input type="text" id="add-apellidos" placeholder="APELLIDOS" class="w-full p-4 bg-slate-50 rounded-lg text-sm font-bold uppercase">
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="text-[9px] font-black text-slate-400 uppercase">Documento</label>
-                    <input type="number" id="add-documento" placeholder="No. ID" class="w-full p-3 bg-slate-50 rounded-lg text-sm font-bold">
+                    <input type="number" id="add-documento" placeholder="ID" class="w-full p-3 bg-slate-50 rounded-lg text-sm font-bold">
                 </div>
                 <div>
                     <label class="text-[9px] font-black text-slate-400 uppercase">F. Nacimiento</label>
                     <input type="date" id="add-fecha_nacimiento" class="w-full p-3 bg-slate-50 rounded-lg text-sm font-bold">
                 </div>
             </div>
-            <select id="add-proceso" class="w-full p-3 bg-slate-50 rounded-lg text-[11px] font-bold"></select>
-            <select id="add-instrumento" class="w-full p-3 bg-slate-50 rounded-lg text-[11px] font-bold"></select>
-            <select id="add-grado" class="w-full p-3 bg-slate-50 rounded-lg text-[11px] font-bold"></select>
+            <select id="add-proceso" class="w-full p-3 bg-slate-50 rounded-lg text-[11px] font-bold uppercase"></select>
+            <select id="add-instrumento" class="w-full p-3 bg-slate-50 rounded-lg text-[11px] font-bold uppercase"></select>
+            <select id="add-grado" class="w-full p-3 bg-slate-50 rounded-lg text-[11px] font-bold uppercase"></select>
             <button onclick="saveNewStudent()" class="w-full bg-slate-900 text-white p-4 rounded-xl font-bold uppercase text-xs">Guardar Registro</button>
         </div>
     </div>
 
     <script>
         const MOTOR_URL = "https://script.google.com/macros/s/AKfycby9Uhz781irc-n9TbVAmbCu2Bh1QVZU1w0xnACPAa64_17AGbCrTYviTu3IacHACYpY2w/exec";
-        let session = JSON.parse(localStorage.getItem('atril_v2')) || { user: "", banda: "", sheetId: "", current: "screen-login", master: [], config: {} };
-        let record = JSON.parse(localStorage.getItem('atril_rec_v2')) || {};
+        
+        // ORDEN INSTRUMENTAL DEFINIDO
+        const ORDEN_INST = [
+            "flauta", "oboe", "fagot", "clarinete requinto", "clarinete soprano", 
+            "clarinete bajo", "saxofon soprano", "saxofon alto", "saxofon tenor", 
+            "saxofon baritono", "trompeta", "corno", "trombon", "eufonio", 
+            "tuba", "cello", "contrabajo", "percusion"
+        ];
+
+        let session = JSON.parse(localStorage.getItem('atril_v3')) || { user: "", banda: "", sheetId: "", current: "screen-login", master: [], config: {} };
+        let record = JSON.parse(localStorage.getItem('atril_rec_v3')) || {};
 
         window.onload = () => { if(session.user) restore(); else nav('screen-login'); };
 
         function nav(id) {
-            session.current = id; localStorage.setItem('atril_v2', JSON.stringify(session));
+            session.current = id; localStorage.setItem('atril_v3', JSON.stringify(session));
             document.querySelectorAll('body > div').forEach(d => d.id !== 'loader' && d.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
             if(id === 'screen-activity') document.getElementById('event-date').value = new Date().toISOString().split('T')[0];
@@ -153,7 +162,6 @@
                 if(d.success) {
                     session.user = u; session.banda = d.banda; session.sheetId = d.sheetId;
                     await fetchData();
-                    nav('screen-menu');
                 } else document.getElementById('login-error').classList.remove('hidden');
             } catch(e) { alert("Error red"); }
             loader(false);
@@ -169,10 +177,10 @@
         function restore() {
             document.getElementById('display-band-name').innerText = session.banda;
             if(session.config.proceso) {
-                document.getElementById('process-buttons').innerHTML = session.config.proceso.map(p => `<button onclick="initAt('${p}')" class="w-full p-6 bg-white rounded-2xl shadow-sm border font-bold text-left uppercase text-xs">${p}</button>`).join('');
+                document.getElementById('process-buttons').innerHTML = session.config.proceso.map(p => `<button onclick="initAt('${p}')" class="w-full p-6 bg-white rounded-2xl shadow-sm border font-bold text-left uppercase text-xs tracking-widest">${p}</button>`).join('');
                 ['proceso','instrumento','grado'].forEach(k => {
                     const s = document.getElementById(`add-${k}`);
-                    s.innerHTML = `<option disabled selected>SELECCIONE ${k.toUpperCase()}</option>` + session.config[k].map(o => `<option value="${o}">${o}</option>`).join('');
+                    s.innerHTML = `<option disabled selected>SELECCIONE ${k.toUpperCase()}</option>` + session.config[k].map(o => `<option value="${o}">${o.toUpperCase()}</option>`).join('');
                 });
             }
             nav(session.current);
@@ -187,12 +195,24 @@
             nav('screen-list');
         }
 
+        function sortMusicos(lista) {
+            return lista.sort((a, b) => {
+                const indexA = ORDEN_INST.indexOf(a.instrumento.toLowerCase());
+                const indexB = ORDEN_INST.indexOf(b.instrumento.toLowerCase());
+                if (indexA !== indexB) return (indexA === -1 ? 99 : indexA) - (indexB === -1 ? 99 : indexB);
+                return a.apellidos.localeCompare(b.apellidos);
+            });
+        }
+
         function renderList(secc) {
             document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active-tab'); b.classList.add('text-slate-300'); });
             document.getElementById(`tab-${secc}`).classList.add('active-tab');
             const box = document.getElementById('musicos-box'); box.innerHTML = "";
-            const filtered = session.master.filter(m => String(m.proceso) === String(session.process) && (secc === 'TODOS' || m.seccion === secc));
-            filtered.forEach(m => {
+            
+            let filtered = session.master.filter(m => String(m.proceso) === String(session.process));
+            if(secc !== 'TODOS') filtered = filtered.filter(m => m.seccion === secc);
+            
+            sortMusicos(filtered).forEach(m => {
                 const n = `${m.nombres} ${m.apellidos}`.toUpperCase(), s = record[n] || '';
                 const card = document.createElement('div');
                 card.className = "bg-white p-4 rounded-2xl shadow-sm border musico-card";
@@ -205,31 +225,40 @@
             document.getElementById('counter').innerText = `${Object.keys(record).length} Marcados`;
         }
 
-        function mark(n, st) { record[n] = st; localStorage.setItem('atril_rec_v2', JSON.stringify(record)); renderList(document.querySelector('.active-tab').id.split('-')[1]); }
-        function getCol(s) { return {PRESENTE:'bg-slate-900 text-white', AUSENTE:'bg-red-50 text-red-600', RETARDO:'bg-amber-50 text-amber-600', EXCUSA:'bg-blue-50 text-blue-600'}[s]; }
+        function mark(n, st) { record[n] = st; localStorage.setItem('atril_rec_v3', JSON.stringify(record)); renderList(document.querySelector('.active-tab').id.split('-')[1]); }
+        function getCol(s) { return {PRESENTE:'bg-slate-900 text-white border-slate-900', AUSENTE:'bg-red-50 text-red-600 border-red-100', RETARDO:'bg-amber-50 text-amber-600 border-amber-100', EXCUSA:'bg-blue-50 text-blue-600 border-blue-100'}[s]; }
         function loader(v, t) { document.getElementById('loader-text').innerText = t; document.getElementById('loader').classList.toggle('hidden', !v); }
         function logout() { localStorage.clear(); location.reload(); }
         function filterList() { const q = document.getElementById('search').value.toLowerCase(); document.querySelectorAll('.musico-card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? 'block' : 'none'); }
 
+        function whatsappReport() {
+            const e = Object.entries(record);
+            // Obtener datos completos para ordenar el reporte
+            const getM = (nom) => session.master.find(m => `${m.nombres} ${m.apellidos}`.toUpperCase() === nom);
+            
+            const r = e.filter(([n, s]) => s === 'RETARDO').sort((a,b) => ORDEN_INST.indexOf(getM(a[0]).instrumento.toLowerCase()) - ORDEN_INST.indexOf(getM(b[0]).instrumento.toLowerCase()));
+            const a = e.filter(([n, s]) => s === 'AUSENTE').sort((a,b) => ORDEN_INST.indexOf(getM(a[0]).instrumento.toLowerCase()) - ORDEN_INST.indexOf(getM(b[0]).instrumento.toLowerCase()));
+            
+            let t = `📢 *REPORTE ${session.banda.toUpperCase()}*\n🎼 *PROCESO:* ${session.process.toUpperCase()}\n📅 ${session.date}\n\n`;
+            t += `⏱️ *RETARDOS:*\n${r.length ? r.map(([n]) => `• ${n} (${getM(n).instrumento})`).join('\n') : '_Sin novedades_'}\n\n`;
+            t += `❌ *AUSENCIAS:*\n${a.length ? a.map(([n]) => `• ${n} (${getM(n).instrumento})`).join('\n') : '_Sin novedades_'}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(t)}`);
+        }
+
         async function finalize() {
-            if(!Object.keys(record).length) return alert("Vacío");
+            if(!Object.keys(record).length) return alert("No hay datos marcados");
             loader(true, "Guardando...");
             const data = Object.entries(record).map(([n, e]) => ({ fecha: session.date, tipo_actividad: session.type, nombre_actividad: session.act, proceso: session.process, musico: n, estado: e }));
             await fetch(MOTOR_URL, { method: 'POST', body: JSON.stringify({ action: 'saveAsistencia', sheetId: session.sheetId, asistencia: data })});
-            alert("Guardado"); record = {}; localStorage.removeItem('atril_rec_v2'); nav('screen-menu'); loader(false);
-        }
-
-        function whatsappReport() {
-            const e = Object.entries(record), r = e.filter(([n, s]) => s === 'RETARDO'), a = e.filter(([n, s]) => s === 'AUSENTE');
-            let t = `📢 *REPORTE ${session.banda.toUpperCase()}*\n📅 ${session.date}\n\n⏱️ *RETARDOS:*\n${r.length ? r.map(([n]) => `• ${n}`).join('\n') : '_Sin novedades_'}\n\n❌ *AUSENCIAS:*\n${a.length ? a.map(([n]) => `• ${n}`).join('\n') : '_Sin novedades_'}`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(t)}`);
+            alert("Reporte guardado con éxito"); record = {}; localStorage.removeItem('atril_rec_v3'); nav('screen-menu'); loader(false);
         }
 
         async function saveNewStudent() {
             const d = { nombres: document.getElementById('add-nombres').value, apellidos: document.getElementById('add-apellidos').value, documento: document.getElementById('add-documento').value, fecha_nacimiento: document.getElementById('add-fecha_nacimiento').value, proceso: document.getElementById('add-proceso').value, instrumento: document.getElementById('add-instrumento').value, grado: document.getElementById('add-grado').value };
+            if(!d.nombres || !d.apellidos || !d.proceso) return alert("Faltan campos obligatorios");
             loader(true, "Registrando...");
             await fetch(MOTOR_URL, { method: 'POST', body: JSON.stringify({ action: 'addEstudiante', sheetId: session.sheetId, datos: d })});
-            alert("Listo"); await fetchData(); nav('screen-menu'); loader(false);
+            alert("Estudiante registrado"); await fetchData(); nav('screen-menu'); loader(false);
         }
     </script>
 </body>
