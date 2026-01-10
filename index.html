@@ -110,11 +110,9 @@
         <button onclick="nav('screen-menu')" class="text-slate-400 font-black mb-6 text-[11px] uppercase tracking-widest">← Volver</button>
         <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 space-y-4">
             <h2 class="text-lg font-black uppercase">Nuevo Integrante</h2>
-            
             <input type="text" id="add-nombres" placeholder="Nombres" class="w-full p-4 bg-slate-50 rounded-lg text-sm font-bold">
             <input type="text" id="add-apellidos" placeholder="Apellidos" class="w-full p-4 bg-slate-50 rounded-lg text-sm font-bold">
             <input type="text" id="add-eps" placeholder="EPS / Servicio de Salud" class="w-full p-4 bg-slate-50 rounded-lg text-sm font-bold">
-
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-[9px] font-black text-slate-400 mb-1 uppercase">Documento</label>
@@ -125,17 +123,15 @@
                     <input type="date" id="add-fecha_nacimiento" class="w-full p-3 bg-slate-50 rounded-lg text-sm font-bold">
                 </div>
             </div>
-
             <select id="add-proceso" class="w-full p-3 bg-slate-50 rounded-lg text-[11px] font-bold uppercase"></select>
             <select id="add-instrumento" class="w-full p-3 bg-slate-50 rounded-lg text-[11px] font-bold uppercase"></select>
             <select id="add-grado" class="w-full p-3 bg-slate-50 rounded-lg text-[11px] font-bold uppercase"></select>
-            
             <button onclick="saveNewStudent()" class="w-full bg-slate-900 text-white p-4 rounded-xl font-bold uppercase text-xs">Guardar Registro</button>
         </div>
     </div>
 
     <script>
-        const MOTOR_URL = "https://script.google.com/macros/s/AKfycbypY8EqjSt2wEcfe2sD2DMrRqVR6u4wG1APdEouYIBJ047Am27iuy272vNvk09O13I4tQ/exec";
+        const MOTOR_URL = "https://script.google.com/macros/s/AKfycbw6fC_7SKnRql42YDnbHaIrQOCVGUUQf53sR7cP-evs1ldDOOJfPXqZxxJg5V9hHPydfA/exec";
         
         const SECCIONES = {
             "Maderas": ["flauta", "oboe", "fagot", "clarinete requinto", "clarinete soprano", "clarinete bajo", "saxofon soprano", "saxofon alto", "saxofon tenor", "saxofon baritono"],
@@ -167,10 +163,10 @@
                 const r = await fetch(`${MOTOR_URL}?action=login&user=${encodeURIComponent(u)}&pass=${encodeURIComponent(p)}`);
                 const d = await r.json();
                 if(d.success) {
-                    if(d.status === "INACTIVO") alert("Inactivo");
+                    if(d.status === "INACTIVO") alert("Usuario inactivo");
                     else { session.user = u; session.banda = d.banda; session.sheetId = d.sheetId; await fetchData(); nav('screen-menu'); }
                 } else document.getElementById('login-error').classList.remove('hidden');
-            } catch(e) { alert("Error red"); }
+            } catch(e) { alert("Error de red"); }
             loader(false);
         }
 
@@ -207,21 +203,18 @@
             document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active-tab'); b.classList.add('text-slate-300'); });
             document.getElementById(`tab-${secc}`).classList.add('active-tab');
             const box = document.getElementById('musicos-box'); box.innerHTML = "";
-            
             let filtered = session.master.filter(m => {
                 const coincideProceso = String(m.proceso) === String(session.process);
                 if (secc === 'TODOS') return coincideProceso;
                 const miFamilia = Object.keys(SECCIONES).find(key => SECCIONES[key].includes(m.instrumento.toLowerCase()));
                 return coincideProceso && miFamilia === secc;
             });
-
             filtered.sort((a,b) => {
                 let idxA = ORDEN_INST.indexOf(a.instrumento.toLowerCase());
                 let idxB = ORDEN_INST.indexOf(b.instrumento.toLowerCase());
                 if (idxA !== idxB) return (idxA === -1 ? 99 : idxA) - (idxB === -1 ? 99 : idxB);
                 return a.apellidos.localeCompare(b.apellidos);
             });
-
             filtered.forEach(m => {
                 const n = `${m.nombres} ${m.apellidos}`.toUpperCase(), s = record[n] || '';
                 const card = document.createElement('div');
@@ -243,11 +236,14 @@
         function filterList() { const q = document.getElementById('search').value.toLowerCase(); document.querySelectorAll('.musico-card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? 'block' : 'none'); }
 
         async function finalize() {
-            if(!Object.keys(record).length) return alert("Vacio");
+            if(!Object.keys(record).length) return alert("Nada que guardar");
             loader(true, "Guardando...");
             const data = Object.entries(record).map(([n, e]) => ({ fecha: session.date, tipo_actividad: session.type, nombre_actividad: session.act, proceso: session.process, musico: n, estado: e }));
-            await fetch(MOTOR_URL, { method: 'POST', body: JSON.stringify({ action: 'saveAsistencia', sheetId: session.sheetId, asistencia: data })});
-            alert("Guardado"); record = {}; localStorage.removeItem('atril_rec_v5'); nav('screen-menu'); loader(false);
+            try {
+                await fetch(MOTOR_URL, { method: 'POST', body: JSON.stringify({ action: 'saveAsistencia', sheetId: session.sheetId, asistencia: data })});
+                alert("Guardado"); record = {}; localStorage.removeItem('atril_rec_v5'); nav('screen-menu');
+            } catch(e) { alert("Error al guardar"); }
+            loader(false);
         }
 
         function whatsappReport() {
@@ -257,29 +253,14 @@
         }
 
         async function saveNewStudent() {
-            const d = { 
-                nombres: document.getElementById('add-nombres').value, 
-                apellidos: document.getElementById('add-apellidos').value, 
-                eps: document.getElementById('add-eps').value,
-                documento: document.getElementById('add-documento').value, 
-                fecha_nacimiento: document.getElementById('add-fecha_nacimiento').value, 
-                proceso: document.getElementById('add-proceso').value, 
-                instrumento: document.getElementById('add-instrumento').value, 
-                grado: document.getElementById('add-grado').value 
-            };
-            if(!d.nombres || !d.apellidos) return alert("Completa nombres y apellidos");
+            const d = { nombres: document.getElementById('add-nombres').value, apellidos: document.getElementById('add-apellidos').value, eps: document.getElementById('add-eps').value, documento: document.getElementById('add-documento').value, fecha_nacimiento: document.getElementById('add-fecha_nacimiento').value, proceso: document.getElementById('add-proceso').value, instrumento: document.getElementById('add-instrumento').value, grado: document.getElementById('add-grado').value };
+            if(!d.nombres || !d.apellidos) return alert("Faltan datos básicos");
             loader(true, "Registrando...");
             try {
                 await fetch(MOTOR_URL, { method: 'POST', body: JSON.stringify({ action: 'addEstudiante', sheetId: session.sheetId, datos: d })});
                 alert("Registro Exitoso");
-                document.getElementById('add-nombres').value = "";
-                document.getElementById('add-apellidos').value = "";
-                document.getElementById('add-eps').value = "";
-                document.getElementById('add-documento').value = "";
-                document.getElementById('add-fecha_nacimiento').value = "";
-                document.getElementById('add-proceso').selectedIndex = 0;
-                document.getElementById('add-instrumento').selectedIndex = 0;
-                document.getElementById('add-grado').selectedIndex = 0;
+                document.querySelectorAll('#screen-add-student input').forEach(i => i.value = "");
+                document.querySelectorAll('#screen-add-student select').forEach(s => s.selectedIndex = 0);
                 await fetchData();
             } catch(e) { alert("Error al registrar"); }
             loader(false);
