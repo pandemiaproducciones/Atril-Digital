@@ -17,6 +17,8 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         input, select { border: 1px solid #e2e8f0 !important; }
         input:focus, select:focus { border-color: #0f172a !important; ring: 1px solid #0f172a; }
+        /* Evita flechas en inputs numéricos */
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body class="text-slate-800">
@@ -57,6 +59,10 @@
             <span class="font-black text-slate-700 text-sm uppercase tracking-wider">Ingresar Estudiantes</span>
             <div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center group-hover:bg-slate-100">👤</div>
         </button>
+
+        <div class="pt-10 flex justify-center opacity-90">
+            <img src="https://github.com/pandemiaproducciones/Atril-Digital/blob/main/logo.png?raw=true" alt="Logo Atril Digital" class="w-48 h-auto object-contain">
+        </div>
     </div>
 
     <div id="screen-add-student" class="hidden p-6 max-w-md mx-auto pb-20">
@@ -70,7 +76,7 @@
             <div class="grid grid-cols-2 gap-2">
                 <div class="space-y-1">
                     <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Documento</label>
-                    <input type="text" id="add-documento" placeholder="ID" class="w-full p-3 bg-slate-50 rounded-lg font-medium text-sm">
+                    <input type="number" inputmode="numeric" id="add-documento" placeholder="ID" onkeydown="return event.keyCode !== 190 && event.keyCode !== 110" class="w-full p-3 bg-slate-50 rounded-lg font-medium text-sm">
                 </div>
                 <div class="space-y-1">
                     <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">F. Nacimiento</label>
@@ -156,7 +162,7 @@
             const u = document.getElementById('user-input').value.trim();
             const p = document.getElementById('pass-input').value.trim();
             if(!u || !p) return;
-            toggleLoader(true, "Iniciando Sesión..."); // Texto solicitado
+            toggleLoader(true, "Iniciando Sesión...");
             try {
                 const resp = await fetch(`${MOTOR_URL}?action=login&user=${encodeURIComponent(u)}&pass=${encodeURIComponent(p)}`);
                 const data = await resp.json();
@@ -205,7 +211,6 @@
         function nav(id) {
             document.querySelectorAll('body > div').forEach(d => d.id !== 'loader' && d.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
-            // Fecha actual por defecto
             if(id === 'screen-activity') document.getElementById('event-date').value = new Date().toISOString().split('T')[0];
             if(id === 'screen-list') renderList('TODOS');
         }
@@ -295,8 +300,7 @@
                 alert("Estudiante ingresado correctamente");
                 
                 ['nombres','apellidos','documento','fecha_nacimiento','eps'].forEach(id => document.getElementById(`add-${id}`).value = "");
-                await fetchFullData(); // Sincroniza la lista de inmediato
-                
+                await fetchFullData();
                 nav('screen-menu');
             } catch(e) { alert("Error al guardar"); }
             toggleLoader(false);
