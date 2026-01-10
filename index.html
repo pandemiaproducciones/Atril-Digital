@@ -25,7 +25,7 @@
     </div>
 
     <div id="screen-login" class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white p-10 rounded-3xl shadow-xl w-full max-w-sm text-center border border-slate-100">
+        <div class="bg-white p-10 rounded-3xl shadow-xl w-full max-sm text-center border border-slate-100">
             <img src="https://github.com/pandemiaproducciones/Atril-Digital/blob/main/logo.png?raw=true" class="w-24 mx-auto mb-6">
             <h1 class="text-2xl font-black mb-1 uppercase tracking-tighter">ATRIL DIGITAL</h1>
             <p class="text-slate-400 text-[10px] mb-8 font-bold tracking-widest">GESTIÓN DE BANDAS</p>
@@ -110,9 +110,9 @@
         <button onclick="nav('screen-menu')" class="text-slate-400 font-black mb-6 text-[11px] uppercase tracking-widest">← Volver</button>
         <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 space-y-4">
             <h2 class="text-lg font-black uppercase">Nuevo Integrante</h2>
-            <input type="text" id="add-nombres" placeholder="NOMBRES" class="w-full p-4 bg-slate-50 rounded-lg text-sm font-bold uppercase">
-            <input type="text" id="add-apellidos" placeholder="APELLIDOS" class="w-full p-4 bg-slate-50 rounded-lg text-sm font-bold uppercase">
-            <input type="text" id="add-eps" placeholder="EPS / SERVICIO DE SALUD" class="w-full p-4 bg-slate-50 rounded-lg text-sm font-bold uppercase">
+            <input type="text" id="add-nombres" placeholder="Nombres" class="w-full p-4 bg-slate-50 rounded-lg text-sm font-bold">
+            <input type="text" id="add-apellidos" placeholder="Apellidos" class="w-full p-4 bg-slate-50 rounded-lg text-sm font-bold">
+            <input type="text" id="add-eps" placeholder="EPS / Servicio de Salud" class="w-full p-4 bg-slate-50 rounded-lg text-sm font-bold">
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-[9px] font-black text-slate-400 mb-1 uppercase">Documento</label>
@@ -125,20 +125,16 @@
             </div>
             <select id="add-proceso" class="w-full p-3 bg-slate-50 rounded-lg text-[11px] font-bold uppercase"></select>
             <select id="add-instrumento" class="w-full p-3 bg-slate-50 rounded-lg text-[11px] font-bold uppercase"></select>
-            
             <div class="grid grid-cols-2 gap-2">
                 <select id="add-grado" class="w-full p-3 bg-slate-50 rounded-lg text-[11px] font-bold uppercase"></select>
-                <select id="add-tipo_letra" class="w-full p-3 bg-slate-50 rounded-lg text-[11px] font-bold uppercase">
-                    <option value="NINGUNA">- NINGUNA -</option>
-                </select>
+                <select id="add-tipo_letra" class="w-full p-3 bg-slate-50 rounded-lg text-[11px] font-bold uppercase"></select>
             </div>
-
             <button onclick="saveNewStudent()" class="w-full bg-slate-900 text-white p-4 rounded-xl font-bold uppercase text-xs">Guardar Registro</button>
         </div>
     </div>
 
     <script>
-        const MOTOR_URL = "https://script.google.com/macros/s/AKfycbyfKCs4cKs7RU5ihFxFuYi2RTgqzj-MGTuZ7z8VTbQU5GKV8H8YqmCJScm8lclUperAvg/exec";
+        const MOTOR_URL = "https://script.google.com/macros/s/AKfycbx6z_DgPe9fFwPE2O6f8uNcNKX5GkEmab5h_W2V14LKH-KDAraIFKZ-35SfF4bLQzHZng/exec";
         
         const SECCIONES = {
             "Maderas": ["flauta", "oboe", "fagot", "clarinete requinto", "clarinete soprano", "clarinete bajo", "saxofon soprano", "saxofon alto", "saxofon tenor", "saxofon baritono"],
@@ -267,9 +263,9 @@
 
         async function saveNewStudent() {
             const d = { 
-                nombres: document.getElementById('add-nombres').value.toUpperCase(), 
-                apellidos: document.getElementById('add-apellidos').value.toUpperCase(), 
-                eps: document.getElementById('add-eps').value.toUpperCase(), 
+                nombres: document.getElementById('add-nombres').value, 
+                apellidos: document.getElementById('add-apellidos').value, 
+                eps: document.getElementById('add-eps').value, 
                 documento: document.getElementById('add-documento').value, 
                 fecha_nacimiento: document.getElementById('add-fecha_nacimiento').value, 
                 proceso: document.getElementById('add-proceso').value, 
@@ -277,7 +273,7 @@
                 grado: document.getElementById('add-grado').value,
                 tipo_letra: document.getElementById('add-tipo_letra').value 
             };
-            if(!d.nombres || !d.apellidos || d.grado === 'GRADO') return alert("Faltan datos obligatorios");
+            if(!d.nombres || !d.apellidos || !d.grado || d.grado === 'GRADO') return alert("Faltan datos obligatorios");
             loader(true, "Registrando...");
             try {
                 await fetch(MOTOR_URL, { method: 'POST', body: JSON.stringify({ action: 'addEstudiante', sheetId: session.sheetId, datos: d })});
